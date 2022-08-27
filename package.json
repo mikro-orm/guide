@@ -1,0 +1,42 @@
+{
+  "name": "mikro-orm-tutorial",
+  "version": "5.0.0",
+  "main": "index.js",
+  "type": "module",
+  "repository": "https://github.com/mikro-orm/mikro-orm-tutorial",
+  "author": "Martin Adamek",
+  "license": "MIT",
+  "dependencies": {
+    "@mikro-orm/core": "^5.3.2-dev.25",
+    "@mikro-orm/reflection": "^5.3.2-dev.25",
+    "@mikro-orm/sql-highlighter": "^1.0.1",
+    "@mikro-orm/sqlite": "^5.3.2-dev.25",
+    "acorn": "^8.8.0",
+    "acorn-loose": "^8.3.0",
+    "acorn-walk": "^8.2.0",
+    "fastify": "^4.5.3",
+    "slug": "^6.0.0",
+    "tslib": "^2.4.0"
+  },
+  "devDependencies": {
+    "@mikro-orm/cli": "^5.3.2-dev.25",
+    "@mikro-orm/seeder": "^5.3.2-dev.25",
+    "@types/node": "^18.7.13",
+    "@types/slug": "^5.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.7.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node src/server.ts",
+    "mikro-orm": "NODE_OPTIONS='--loader ts-node/esm' mikro-orm",
+    "test": "ts-node src/app.test.ts"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "src/mikro-orm.config.ts",
+      "dist/mikro-orm.config.js"
+    ]
+  }
+}
