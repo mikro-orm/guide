@@ -1,7 +1,5 @@
 import { defineConfig, GeneratedCacheAdapter, Options } from '@mikro-orm/sqlite';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
-import { SeedManager } from '@mikro-orm/seeder';
-import { Migrator } from '@mikro-orm/migrations';
 import { existsSync, readFileSync } from 'node:fs';
 
 const options = {} as Options;
@@ -31,6 +29,5 @@ export default defineConfig({
   dynamicImportProvider: id => import(id),
   // for highlighting the SQL queries
   highlighter: new SqlHighlighter(),
-  extensions: [SeedManager, Migrator],
   ...options,
 });
