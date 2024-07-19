@@ -8,4 +8,8 @@ export class Migration20220913205718 extends Migration {
     this.addSql('create index `comment_author_id_index` on `comment` (`author_id`);');
   }
 
+  down(): Promise<void> | void {
+    this.addSql('drop table `comment`;');
+  }
+
 }

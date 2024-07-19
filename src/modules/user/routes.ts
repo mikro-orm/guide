@@ -32,7 +32,7 @@ export async function registerUserRoutes(app: FastifyInstance) {
 
     // thanks to zod, our `dto` is fully typed and passes the `em.create()` checks
     const user = db.user.create(dto);
-    await db.em.flush(); // no need for explcit `em.persist()` when we use `em.create()`
+    await db.em.flush(); // no need for explicit `em.persist()` when we use `em.create()`
 
     // after flush, we have the `user.id` set
     user.token = app.jwt.sign({ id: user.id });
