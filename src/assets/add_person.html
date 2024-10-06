@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Person Data Entry Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+<div id="app" class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-2">Lisage ajalooline isik!</h1>
+  <div class="mb-3">
+    <i class="text-gray-400">NB! kui väljal pole punast (<span class="text-red-500">*</span>) juures siis <strong>pole</strong> tegemist kohustuliku väljaga!</i>
+  </div>
+  <form id="personForm" class="space-y-4">
+    <div>
+      <label for="lastName" class="block">Perenimi:<span class="text-red-500">*</span></label>
+      <input id="lastName" name="lastName" placeholder="Lydia" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label for="firstName" class="block">Eesnimi:</label>
+      <input id="firstName" name="firstName" placeholder="Koidula" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label for="nicknames" class="block">Varjunimi(/ed) (kui mitu, siis eralda komaga):</label>
+      <input id="nicknames" name="nicknames" placeholder="olin-100-kroonisel" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label for="dob" class="block">Sünniaeg (samamoodi nagu exceli tabelis):</label>
+      <input id="dob" name="dateOfBirth" placeholder="11.11.1911" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label for="birthplace" class="block">Sünnikoht:<span class="text-red-500">*</span></label>
+      <input id="birthplace" name="birthplace" placeholder="Seebi tn, Tallinn" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label for="dod" class="block">Surmaaeg:</label>
+      <input id="dod" name="dateOfDeath" placeholder="12.11.1911" class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label class="block">Kategooriad:<span class="text-red-500">*</span></label>
+      <div id="categoriesContainer"></div>
+      <button type="button" id="addCategory" class="p-2 bg-blue-500 text-white rounded mt-2">Lisa kategooria</button>
+    </div>
+    <div>
+      <!-- todo add how many chars left -->
+      <label for="description" class="block">Elulugu (max 1000 tähemärki):<span class="text-red-500">*</span></label>
+      <textarea id="description" placeholder="minu imeline elulugu :)" name="description" rows="4" class="w-full p-2 border rounded"></textarea>
+    </div>
+    <div>
+      <label class="block">Erinevad allikas (see raamat vms oli, pilt):<span class="text-red-500">*</span></label>
+      <div id="sourcesContainer"></div>
+      <button type="button" id="addSource" class="p-2 bg-blue-500 text-white rounded mt-2">Lisa allikas</button>
+    </div>
+    <div>
+      <label for="xCoordinate" class="block">X Koordinaadid:<span class="text-red-500">*</span></label>
+      <input id="xCoordinate" name="xCoordinate" placeholder="58.4623502" type="number" step="any" required class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label for="yCoordinate" class="block">Y Koordinaadid:<span class="text-red-500">*</span></label>
+      <input id="yCoordinate" name="yCoordinate" placeholder="26.7180363" type="number" step="any" required class="w-full p-2 border rounded">
+    </div>
+    <div>
+      <label for="yCoordinate" class="block">Võti:<span class="text-red-500">*</span></label>
+      <input id="apiKey" name="apiKey" placeholder="salajane võti mis sinuga jagatud" required class="w-full p-2 border rounded">
+    </div>
+    <button type="submit" class="p-2 bg-green-500 text-white rounded">Salvesta andmebaasi</button>
+  </form>
+</div>
+
+<script>
+    class PersonDto {
+        constructor() {
+            this.lastName = null
+            this.firstName = null
+            this.nicknames = null
+            this.dateOfBirth = null
+            this.birthplace = null
+            this.dateOfDeath = null
+            this.description = null
+            this.xCoordinate = null
+            this.yCoordinate = null
+            this.categories = []
+            this.subCategories = []
+            this.sources = []
+        }
+    }
+
+    let categories = []
+    let subCategories = {}
+    const backendUrl = 'http://localhost:3001'
+
+    function createSelect(options, placeholder) {
+        const select = document.createElement('select')
+        select.className = 'p-2 border rounded w-full'
+        const placeholderOption = document.createElement('option')
+        placeholderOption.textContent = placeholder
+        placeholderOption.value = ''
+        select.appendChild(placeholderOption)
+        options.forEach(option => {
+            const optionElement = document.createElement('option')
+            optionElement.textContent = option
+            optionElement.value = option
+            select.appendChild(optionElement)
+        })
+        return select
+    }
+
+    function addCategoryField() {
+        const container = document.createElement('div')
+        container.className = 'flex space-x-2 mb-2'
+
+        const categorySelect = createSelect(categories, 'Vali kategooria')
+        categorySelect.className += ' flex-grow'
+        container.appendChild(categorySelect)
+
+        const subCategorySelect = createSelect([], 'Vali alamkategooria')
+        subCategorySelect.className += ' flex-grow'
+        subCategorySelect.disabled = true
+        container.appendChild(subCategorySelect)
+
+        categorySelect.addEventListener('change', (e) => {
+            const selectedCategory = e.target.value;
+            subCategorySelect.innerHTML = ''; // Clear previous options
+
+            const placeholderOption = document.createElement('option');
+            placeholderOption.textContent = 'Vali alamkategooria';
+            placeholderOption.value = '';
+            subCategorySelect.appendChild(placeholderOption);
+
+            const subCategoriesForSelectedCategory = subCategories[selectedCategory] || [];
+
+            if (subCategoriesForSelectedCategory.length > 0) {
+                subCategoriesForSelectedCategory.forEach(subCat => {
+                    const option = document.createElement('option');
+                    option.value = subCat;
+                    option.textContent = subCat;
+                    subCategorySelect.appendChild(option);
+                });
+                subCategorySelect.disabled = false; // Enable if subcategories exist
+            } else {
+                subCategorySelect.disabled = true; // Disable if no subcategories
+            }
+        });
+
+        const removeButton = document.createElement('button')
+        removeButton.textContent = 'Kustuta'
+        removeButton.className = 'p-2 bg-red-500 text-white rounded'
+        removeButton.type = 'button'
+        removeButton.onclick = () => container.remove()
+        container.appendChild(removeButton)
+
+        document.getElementById('categoriesContainer').appendChild(container)
+    }
+
+    function addSourceField() {
+        const container = document.createElement('div')
+        container.className = 'space-y-2 mb-4'
+
+        const sourceTypeSelect = createSelect(['ELULUGU', 'PILT', 'RAAMAT'], 'Vali allika tüüp!')
+        container.appendChild(sourceTypeSelect)
+
+        const sourceInput = document.createElement('input')
+        sourceInput.placeholder = 'Allikas'
+        sourceInput.className = 'w-full p-2 border rounded'
+        container.appendChild(sourceInput)
+        sourceInput.style.visibility = 'hidden'
+
+        sourceTypeSelect.addEventListener('change', (e) => {
+            const selectedType = e.target.value
+            sourceInput.style.visibility = 'visible'
+
+            if (selectedType === 'PILT') {
+                sourceInput.placeholder = 'Pildi URL'
+            } else if (selectedType === 'ELULUGU') {
+                sourceInput.placeholder = 'Eluloo URL'
+            } else if (selectedType === 'RAAMAT') {
+                sourceInput.placeholder = 'Raamatu nimi'
+            } else {
+                sourceInput.style.visibility = 'hidden'
+            }
+        })
+
+        const removeButton = document.createElement('button')
+        removeButton.textContent = 'Kustuta'
+        removeButton.className = 'p-2 bg-red-500 text-white rounded'
+        removeButton.type = 'button'
+        removeButton.onclick = () => container.remove()
+        container.appendChild(removeButton)
+
+        document.getElementById('sourcesContainer').appendChild(container)
+    }
+
+    document.getElementById('addCategory').addEventListener('click', addCategoryField)
+    document.getElementById('addSource').addEventListener('click', addSourceField)
+
+    document.getElementById('personForm').addEventListener('submit', async (e) => {
+        e.preventDefault()
+
+        //apiKey
+        const apiKey = document.querySelector('input[name="apiKey"]').value || null
+        if (!apiKey) {
+            console.error(`No API key provided!`)
+            alert("Andmebaasi salvestamiseks peab lisama salajase võtme!")
+            return
+        }
+
+        const personDto = new PersonDto()
+
+        // Required fields
+        personDto.lastName = document.querySelector('input[name="lastName"]').value || null
+        personDto.birthplace = document.querySelector('input[name="birthplace"]').value || null
+        personDto.description = document.querySelector('textarea[name="description"]').value || null
+        personDto.xCoordinate = parseFloat(document.querySelector('input[name="xCoordinate"]').value) || null
+        personDto.yCoordinate = parseFloat(document.querySelector('input[name="yCoordinate"]').value) || null
+
+        if (!personDto.lastName || !personDto.birthplace || !personDto.description || !personDto.xCoordinate || !personDto.yCoordinate) {
+            console.error('Not all data provided for all the required fields!')
+            alert('Palun täida kõik kohustuslikud väljad (märgitud punase tärniga)!')
+            return
+        }
+
+        // Optional fields
+        personDto.firstName = document.querySelector('input[name="firstName"]').value || null
+        personDto.nicknames = document.querySelector('input[name="nicknames"]').value
+            ? document.querySelector('input[name="nicknames"]').value.split(',').map(n => n.trim())
+            : null
+        personDto.dateOfBirth = document.querySelector('input[name="dateOfBirth"]').value || null
+        personDto.dateOfDeath = document.querySelector('input[name="dateOfDeath"]').value || null
+
+        // Categories and SubCategories
+        personDto.categories = Array.from(document.querySelectorAll('#categoriesContainer select:first-child'))
+            .map(select => select.value)
+            .filter(Boolean)
+
+        personDto.subCategories = Array.from(document.querySelectorAll('#categoriesContainer select:nth-child(2)'))
+            .map(select => select.value)
+            .filter(Boolean)
+        console.log(personDto.subCategories)
+
+        // Sources
+        personDto.sources = Array.from(document.querySelectorAll('#sourcesContainer > div')).map(div => {
+            const sourceType = div.querySelector('select').value
+            const source = div.querySelector('input').value
+            return {
+                sourceType,
+                source
+            }
+        }).filter(source => source.source)
+
+        try {
+            const response = await fetch(backendUrl + '/person', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-KEY': apiKey
+                },
+                body: JSON.stringify(personDto),
+            })
+
+            if (response.ok) {
+                alert('Isiku andmed edukalt baasi salvestatud!')
+                e.target.reset()
+                document.getElementById('categoriesContainer').innerHTML = ''
+                document.getElementById('sourcesContainer').innerHTML = ''
+            } else {
+                alert('Error submitting person data')
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            alert('Error submitting person data')
+        }
+    })
+
+    // Fetch categories and sub-categories
+    fetch(backendUrl + '/category')
+        .then(response => response.json())
+        .then(data => {
+            categories = data.map(category => category.name)
+            data.forEach(category => {
+                subCategories[category.name] = category.subCategories
+            })
+        })
+        .catch(error => console.error('Error fetching categories:', error))
+</script>
+</body>
+</html>

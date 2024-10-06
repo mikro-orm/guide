@@ -1,6 +1,7 @@
 import { defineConfig, GeneratedCacheAdapter, Options } from '@mikro-orm/sqlite';
 import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
 import { existsSync, readFileSync } from 'node:fs';
+import * as process from "node:process"
 
 const options = {} as Options;
 
@@ -19,7 +20,9 @@ if (process.env.NODE_ENV === 'production' && existsSync('./temp/metadata.json'))
 
 export default defineConfig({
   // for simplicity, we use the SQLite database, as it's available pretty much everywhere
-  dbName: 'sqlite.db',
+  //todo build script can't read process.env.DATABASE_HOSTNAME
+  // dbName: 'kaardirakendus.db',
+  dbName: process.env.DATABASE_HOSTNAME,
   // folder based discovery setup, using common filename suffix
   entities: ['dist/**/*.entity.js'],
   entitiesTs: ['src/**/*.entity.ts'],

@@ -1,5 +1,9 @@
 .idea
 node_modules
-sqlite.db
 dist
 temp
+
+.env
+
+#db
+*.db

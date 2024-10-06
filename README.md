@@ -1,60 +1,140 @@
-# MikroORM: Getting started
+# Kaardirakendus - Eesti avalike tegelaste sünnigeograafia
 
-Read the full text on https://mikro-orm.io/docs/guide.
+Using vanillaJS in the client side and Fastify(TS) + MikroORM + SQLite in the server side. By default, firewall rules are configured to only allow traffic from Estonian IPs.
 
-## Introduction
+## Running the application locally
+Create a database and add the hostname (sqlite_database.db) to `.env`
 
-MikroORM is a TypeScript ORM for Node.js based on Data Mapper, Unit of Work, and Identity Map patterns. In this guide, you will learn what those words mean, how to set up a simple API project, how to test it, and many more.
+[Create tables](./src/assets/sql/create_tables.sql) inside the created db and then add [categories and sub-categories](./src/assets/sql/categories_and_sub-categories.sql)
 
-[This Getting Started Guide](https://mikro-orm.io/docs/guide) was written as a step-by-step tutorial, accompanied by working StackBlitz examples and a [GitHub repository with the final project](https://github.com/mikro-orm/guide). It will show you how to create a production-ready application from scratch, all the way down to a docker image you can deploy wherever you want.
+**Local development**
+Run `npm run start:dev` for development environment. Can set up your own API key in the `.env` file (project root).
 
-## The Stack
+**Build Docker image**
+Run `docker build -t geo-estonia-public-figs/prod .` in the projects root directory.
 
-The goal of this guide is to show off the most important features of MikroORM as well as some of the more niche ones. It will walk you through creating a simple API for a blog, with the following technologies:
+## Configuring a firewall
+Solid and short explanation of [nftables](https://www.youtube.com/watch?v=83_M2NRgUtg) <br>
+Can set up in the cloud providers UI. In this case using CLI for it (VM running on Debian 12 bookworm). Both `iptables` and `nftables` are possible options, using `nftables` in this instance:
 
-- [MikroORM](https://mikro-orm.io) with SQLite driver
-- [Fastify](https://www.fastify.io) as the web framework
-- [Vitest](https://vitest.dev) for testing
-- ECMAScript modules
-- JWT authentication
-- reflection via [ts-morph](https://ts-morph.com)
+Install `nftables`
+```shell
+sudo apt update
+sudo apt install nftables
+```
 
-## What are we building?
+Enable `nftables`
+```shell
+# check status, if stopped or disabled, then enable and start
+sudo systemctl status nftables
 
-We already mentioned what technologies will be used, and now more about the project. It will be a simple API for a blog, with authentication, publishing, and commenting. For that, we will use four regular entities: `User`, `Article`, `Comment`, and `Tag`. Later on, we will add one more entity, `ArticleListing`, a virtual entity represented by an SQL expression rather than a database table.
+sudo systemctl start nftables
+sudo systemctl enable nftables
+```
 
-And the API routes description:
+Sample `nftables` ruleset file
+```shell
+#!/usr/sbin/nft -f
 
-| Method   | URL                      | Description                       |
-|----------|--------------------------|-----------------------------------|
-| `POST`   | `/user/sign-up`          | Register new user                 |
-| `POST`   | `/user/sign-in`          | Login existing user               |
-| `GET`    | `/user/profile`          | Get your full profile info        |
-| `PATCH`  | `/user/profile`          | Modify your profile               |
-| `POST`   | `/article`               | Create new article                |
-| `GET`    | `/article`               | List existing articles            |
-| `GET`    | `/article/:slug`         | Get article detail                |
-| `PATCH`  | `/article/:slug`         | Modify existing article           |
-| `DELETE` | `/article/:slug`         | Delete existing article           |
-| `POST`   | `/article/:slug/comment` | Post comment for existing article |
+#
+# table declaration
+#
+add table filter
 
-The code will be structured into self-contained modules: `user`, `article`, and `common` (for shared helpers).
+table filter {
+  chain incoming {
+    type filter hook input priority 0; policy drop;
+    
+    # icmp
+    icmp type echo-request accept
+    
+    # open tcp ports: sshd (22), httpd (80)
+    tcp dport { ssh, http, https } accept
+  }
+}
+```
 
-The app will be using Node.js 20, TypeScript 5.2, and we will build it using a modern stack with ECMAScript modules enabled.
+Create `nftables` script
+```shell
+# copy contents from /scripts/create_nftables_estonian_ips_whitelist.sh
+sudo vim create_nftables_estonian_ips_whitelist.sh
 
-## What will we cover
+# give permissions and run the script
+sudo chmod 744 create_nftables_estonian_ips_whitelist.sh
+sudo ./create_nftables_estonian_ips_whitelist.sh
 
-Here is (an incomplete) list of features you will try going through this guide.
+# make sure everything went alright, stdin the ruleset
+sudo nft list ruleset
 
-- creating an app from scratch with TypeScript setup
-- folder-based discovery, ts-morph reflection, ES modules
-- request context management via middleware/fastify hook
-- entity relations, advanced entity definition (e.g. lazy scalar properties)
-- advanced type safety (e.g. `OptionalProps`, `Reference` wrapper and `Loaded` type)
-- events, including advanced use cases like soft-delete via `onFlush` event
-- basic testing via vitest
-- custom repositories
-- virtual entities
-- serialization
-- embeddables
+# see that the ruleset exists in /etc/nftables (press tab)
+ls /etc/nftables #press tab
+# nftables.conf           nftables_estonian.conf
 
+# include the newly created conf to `nftables.conf` to persist the ruleset. Add the statement to the end of the file (right after the last curly bracket '}')
+include "/etc/nftables_estonian.conf"
+
+# reload the nftables conf
+sudo systemctl reload nftables
+```
+
+## Database schema
+```mermaid
+erDiagram
+    person {
+        TEXT id PK
+        TEXT last_name
+        TEXT first_name
+        TEXT date_of_birth
+        TEXT birthplace
+        TEXT date_of_death
+        TEXT description
+        REAL x_coordinate
+        REAL y_coordinate
+    }
+
+    nickname {
+        TEXT id PK
+        TEXT person_id FK
+        TEXT nickname
+        TEXT nickname_comment
+    }
+
+    category {
+        TEXT id PK
+        TEXT name
+    }
+
+    sub_category {
+        TEXT id PK
+        TEXT category_id FK
+        TEXT name
+    }
+
+    person_categories {
+        TEXT person_id FK
+        TEXT category_id FK
+    }
+
+    person_sub_categories {
+        TEXT person_id FK
+        TEXT sub_category_id FK
+    }
+
+    source {
+        TEXT id PK
+        TEXT person_id FK
+        TEXT source_type
+        TEXT source
+    }
+
+%% Relationships
+    person ||--o{ nickname: "has"
+    person ||--o{ person_categories: "categorized as"
+    person ||--o{ person_sub_categories: "sub-categorized as"
+    person ||--o{ source: "has sources"
+
+    category ||--o{ person_categories: "in"
+    sub_category ||--o{ person_sub_categories: "in"
+
+    category ||--o{ sub_category: "contains"
+```

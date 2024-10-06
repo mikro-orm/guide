@@ -1,41 +1,43 @@
-import { MikroORM, Options, EntityManager, EntityRepository } from '@mikro-orm/sqlite';
-import { User } from './modules/user/user.entity.js';
-import { Comment } from './modules/article/comment.entity.js';
-import { Article } from './modules/article/article.entity.js';
-import { Tag } from './modules/article/tag.entity.js';
-import { UserRepository } from './modules/user/user.repository.js';
-import { ArticleRepository } from './modules/article/article.repository.js';
-import config from './mikro-orm.config.js';
+import { MikroORM, Options, EntityManager } from '@mikro-orm/sqlite'
+import config from './mikro-orm.config.js'
+import { CategoryRepository } from "./modules/category/category.repository.js"
+import { Category } from "./modules/category/category.entity.js"
+import { PersonRepository } from "./modules/person/person.repository.js"
+import { Person } from "./modules/person/person.entity.js"
+import { SubCategoryRepository } from "./modules/sub-category/sub-category.repository.js"
+import { SubCategory } from "./modules/sub-category/sub-category.entity.js"
+import { SourceRepository } from "./modules/source/source.repository.js"
+import { Source } from "./modules/source/source.entity.js"
 
 export interface Services {
-  orm: MikroORM;
-  em: EntityManager;
-  comment: EntityRepository<Comment>;
-  tag: EntityRepository<Tag>;
-  user: UserRepository;
-  article: ArticleRepository;
+  orm: MikroORM
+  em: EntityManager
+  category: CategoryRepository
+  subCategory: SubCategoryRepository
+  person: PersonRepository
+  source: SourceRepository
 }
 
-let cache: Services;
+let cache: Services
 
 export async function initORM(options?: Options): Promise<Services> {
   if (cache) {
-    return cache;
+    return cache
   }
 
   // allow overriding config options for testing
   const orm = await MikroORM.init({
     ...config,
     ...options,
-  });
+  })
 
   // save to cache before returning
   return cache = {
     orm,
     em: orm.em,
-    article: orm.em.getRepository(Article),
-    comment: orm.em.getRepository(Comment),
-    user: orm.em.getRepository(User),
-    tag: orm.em.getRepository(Tag),
-  };
+    category: orm.em.getRepository(Category),
+    subCategory: orm.em.getRepository(SubCategory),
+    person: orm.em.getRepository(Person),
+    source: orm.em.getRepository(Source)
+  }
 }

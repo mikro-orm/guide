@@ -6,7 +6,9 @@
     "strict": true,
     "outDir": "dist",
     "declaration": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "strictPropertyInitialization": false
   },
   "include": [
     "./src/**/*.ts"
