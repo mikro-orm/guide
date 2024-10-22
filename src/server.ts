@@ -1,8 +1,8 @@
-import { bootstrap }  from './app.js';
+import { bootstrap }  from './app.js'
 
 try {
-  const { url } = await bootstrap();
-  console.log(`server started at ${url}`);
+  const { url } = await bootstrap()
+  console.log(`server started at ${url}`)
 } catch (e) {
-  console.error(e);
+  console.error(e)
 }

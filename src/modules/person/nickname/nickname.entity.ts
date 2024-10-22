@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/sqlite"
 import { UUID } from "node:crypto"
-import { Person } from "../person/person.entity.js"
+import { Person } from "../person.entity.js"
 
 @Entity()
 export class Nickname {
@@ -10,8 +10,8 @@ export class Nickname {
     @Property()
     nickname: string
 
-    @Property({ fieldName: "nickname_comment" })
-    xCoordinate?: string
+    @Property({ fieldName: "comment" })
+    comment?: string
 
     @ManyToOne(() => Person, { fieldName: "person_id" })
     person: Person

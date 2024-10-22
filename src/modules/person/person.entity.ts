@@ -10,10 +10,11 @@ import {
 } from "@mikro-orm/sqlite"
 import { PersonRepository } from "./person.repository.js"
 import { UUID } from "node:crypto"
-import { Nickname } from "../nickname/nickname.entity.js"
+import { Nickname } from "./nickname/nickname.entity.js"
 import { Category } from "../category/category.entity.js"
-import { Source } from "../source/source.entity.js"
+import { Source } from "./source/source.entity.js"
 import { SubCategory } from "../sub-category/sub-category.entity.js"
+import { FullName } from "./fullName/full-name.entity.js"
 
 @Entity({ repository: () => PersonRepository })
 export class Person {
@@ -37,7 +38,7 @@ export class Person {
     @Property({ nullable: true, fieldName: "date_of_death" })
     dateOfDeath?: string
 
-    @Property({ nullable: true, fieldName: "description", length: 1000 })
+    @Property({ nullable: true, fieldName: "description" })
     description?: string
 
     @Property({ fieldName: "x_coordinate", columnType: "real" })
@@ -45,6 +46,9 @@ export class Person {
 
     @Property({ fieldName: "y_coordinate", columnType: "real" })
     yCoordinate: number
+
+    @OneToMany(() => FullName, fullName => fullName.person, { cascade: [Cascade.ALL], orphanRemoval: true })
+    fullNames: Collection<FullName> = new Collection<FullName>(this)
 
     @OneToMany(() => Nickname, nickname => nickname.person, { cascade: [Cascade.ALL], orphanRemoval: true })
     nicknames: Collection<Nickname> = new Collection<Nickname>(this)

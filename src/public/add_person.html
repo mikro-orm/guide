@@ -11,6 +11,7 @@
   <h1 class="text-2xl font-bold mb-2">Lisage ajalooline isik!</h1>
   <div class="mb-3">
     <i class="text-gray-400">NB! kui väljal pole punast (<span class="text-red-500">*</span>) juures siis <strong>pole</strong> tegemist kohustuliku väljaga!</i>
+    <i class="text-gray-400"><strong>EHK</strong>, täita tuleb siiski kõik tablis olevad väljad, kuid kui väli pole kohustulik ja tabelis on tühi sisi võib tühjaks jätta!</i>
   </div>
   <form id="personForm" class="space-y-4">
     <div>
@@ -22,6 +23,10 @@
       <input id="firstName" name="firstName" placeholder="Koidula" class="w-full p-2 border rounded">
     </div>
     <div>
+      <label for="fullNames" class="block">Täisnimi(/ed) (kui mitu, siis eralda komaga):</label>
+      <input id="fullNames" name="fullNames" placeholder="Vabarn Anne,Vabarna Anne" class="w-full p-2 border rounded">
+    </div>
+    <div>
       <label for="nicknames" class="block">Varjunimi(/ed) (kui mitu, siis eralda komaga):</label>
       <input id="nicknames" name="nicknames" placeholder="olin-100-kroonisel" class="w-full p-2 border rounded">
     </div>
@@ -30,8 +35,8 @@
       <input id="dob" name="dateOfBirth" placeholder="11.11.1911" class="w-full p-2 border rounded">
     </div>
     <div>
-      <label for="birthplace" class="block">Sünnikoht:<span class="text-red-500">*</span></label>
-      <input id="birthplace" name="birthplace" placeholder="Seebi tn, Tallinn" class="w-full p-2 border rounded">
+      <label for="birthplace" class="block">Kasvukoht:<span class="text-red-500">*</span></label>
+      <input id="birthplace" name="birthplace" placeholder="Kadrioru loss, Tallinn" class="w-full p-2 border rounded">
     </div>
     <div>
       <label for="dod" class="block">Surmaaeg:</label>
@@ -43,8 +48,7 @@
       <button type="button" id="addCategory" class="p-2 bg-blue-500 text-white rounded mt-2">Lisa kategooria</button>
     </div>
     <div>
-      <!-- todo add how many chars left -->
-      <label for="description" class="block">Elulugu (max 1000 tähemärki):<span class="text-red-500">*</span></label>
+      <label for="description" class="block">Elulugu (<i>püüdke palun piiblit mitte kirjutada :)</i>):<span class="text-red-500">*</span></label>
       <textarea id="description" placeholder="minu imeline elulugu :)" name="description" rows="4" class="w-full p-2 border rounded"></textarea>
     </div>
     <div>
@@ -68,11 +72,13 @@
   </form>
 </div>
 
+<script src="environment/environment.prod.ts"></script>
 <script>
     class PersonDto {
         constructor() {
             this.lastName = null
             this.firstName = null
+            this.fullNames = null
             this.nicknames = null
             this.dateOfBirth = null
             this.birthplace = null
@@ -87,8 +93,11 @@
     }
 
     let categories = []
+
     let subCategories = {}
-    const backendUrl = 'http://localhost:3001'
+    // Load environment variables
+    // const backendUrl = environment.backendUrl
+    const backendUrl = "http://34.88.153.11:3001"
 
     function createSelect(options, placeholder) {
         const select = document.createElement('select')
@@ -166,18 +175,28 @@
         container.appendChild(sourceInput)
         sourceInput.style.visibility = 'hidden'
 
+        const locationInput = document.createElement('input')
+        locationInput.placeholder = 'Faili nimi'
+        locationInput.className = 'w-full p-2 border rounded'
+        locationInput.style.visibility = 'hidden' // Initially hidden
+        container.appendChild(locationInput)
+
         sourceTypeSelect.addEventListener('change', (e) => {
             const selectedType = e.target.value
             sourceInput.style.visibility = 'visible'
 
             if (selectedType === 'PILT') {
                 sourceInput.placeholder = 'Pildi URL'
+                locationInput.style.visibility = 'visible' // Show location input if the source is 'PILT'
             } else if (selectedType === 'ELULUGU') {
                 sourceInput.placeholder = 'Eluloo URL'
+                locationInput.style.visibility = 'hidden' // Hide location input for non-PILT types
             } else if (selectedType === 'RAAMAT') {
                 sourceInput.placeholder = 'Raamatu nimi'
+                locationInput.style.visibility = 'hidden'
             } else {
                 sourceInput.style.visibility = 'hidden'
+                locationInput.style.visibility = 'hidden'
             }
         })
 
@@ -190,6 +209,7 @@
 
         document.getElementById('sourcesContainer').appendChild(container)
     }
+
 
     document.getElementById('addCategory').addEventListener('click', addCategoryField)
     document.getElementById('addSource').addEventListener('click', addSourceField)
@@ -222,6 +242,9 @@
 
         // Optional fields
         personDto.firstName = document.querySelector('input[name="firstName"]').value || null
+        personDto.fullNames = document.querySelector('input[name="fullNames"]').value
+            ? document.querySelector('input[name="fullNames"]').value.split(',').map(n => n.trim())
+            : null
         personDto.nicknames = document.querySelector('input[name="nicknames"]').value
             ? document.querySelector('input[name="nicknames"]').value.split(',').map(n => n.trim())
             : null
@@ -242,9 +265,12 @@
         personDto.sources = Array.from(document.querySelectorAll('#sourcesContainer > div')).map(div => {
             const sourceType = div.querySelector('select').value
             const source = div.querySelector('input').value
+            const location = div.querySelectorAll('input')[1]?.value || null // Get location if it exists
+
             return {
                 sourceType,
-                source
+                source,
+                location: sourceType === 'PILT' ? 'images/' + location : null // Include location only if sourceType is 'PILT'
             }
         }).filter(source => source.source)
 
@@ -272,7 +298,6 @@
         }
     })
 
-    // Fetch categories and sub-categories
     fetch(backendUrl + '/category')
         .then(response => response.json())
         .then(data => {

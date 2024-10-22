@@ -2,10 +2,11 @@
 INSERT INTO category (id, name) VALUES
                                     (uuid(), 'KULTUUR'),
                                     (uuid(), 'MAJANDUS'),
-                                    (uuid(), 'POLIITIKA'),
+                                    (uuid(), 'POLIITIKA/VALITSEMINE'),
                                     (uuid(), 'SÕJANDUS'),
                                     (uuid(), 'MEDITSIIN'),
                                     (uuid(), 'HARIDUS'),
+                                    (uuid(), 'TEADUS'),
                                     (uuid(), 'RELIGIOON');
 
 -- Insert sub-categories for KULTUUR
@@ -46,11 +47,11 @@ SELECT uuid(), id, 'rahandus' FROM category WHERE name = 'MAJANDUS';
 
 -- Insert sub-categories for POLIITIKA
 INSERT INTO sub_category (id, category_id, name)
-SELECT uuid(), id, 'riigivõim' FROM category WHERE name = 'POLIITIKA'
+SELECT uuid(), id, 'riigivõim' FROM category WHERE name = 'POLIITIKA/VALITSEMINE'
 UNION ALL
-SELECT uuid(), id, 'kohalik võim' FROM category WHERE name = 'POLIITIKA'
+SELECT uuid(), id, 'kohalik võim' FROM category WHERE name = 'POLIITIKA/VALITSEMINE'
 UNION ALL
-SELECT uuid(), id, 'võõrvõim' FROM category WHERE name = 'POLIITIKA';
+SELECT uuid(), id, 'võõrvõim' FROM category WHERE name = 'POLIITIKA/VALITSEMINE';
 
 -- Insert sub-categories for SÕJANDUS
 INSERT INTO sub_category (id, category_id, name)
@@ -65,3 +66,16 @@ UNION ALL
 SELECT uuid(), id, 'kõrgharidus' FROM category WHERE name = 'HARIDUS'
 UNION ALL
 SELECT uuid(), id, 'rahvaharidus' FROM category WHERE name = 'HARIDUS';
+
+INSERT INTO sub_category (id, category_id, name)
+SELECT uuid(), id, 'humanitaarteadused' FROM category WHERE name = 'TEADUS'
+UNION ALL
+SELECT uuid(), id, 'sotsiaalteadused' FROM category WHERE name = 'TEADUS'
+UNION ALL
+SELECT uuid(), id, 'meditsiiniteadused' FROM category WHERE name = 'TEADUS'
+UNION ALL
+SELECT uuid(), id, 'loodus- ja täppisteadused' FROM category WHERE name = 'TEADUS'
+UNION ALL
+SELECT uuid(), id, 'põllumajandusteadused' FROM category WHERE name = 'TEADUS'
+UNION ALL
+SELECT uuid(), id, 'tehnikateadused' FROM category WHERE name = 'TEADUS';

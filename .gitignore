@@ -4,6 +4,7 @@ dist
 temp
 
 .env
+*.tar
 
 #db
 *.db

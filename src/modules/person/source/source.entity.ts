@@ -1,6 +1,6 @@
 import { Entity, Enum, ManyToOne, PrimaryKey, Property } from "@mikro-orm/sqlite"
 import { UUID } from "node:crypto"
-import { Person } from "../person/person.entity.js"
+import { Person } from "../person.entity.js"
 import { SourceRepository } from "./source.repository.js"
 
 @Entity({ repository: () => SourceRepository })
@@ -16,6 +16,9 @@ export class Source {
 
     @Property()
     source: string
+
+    @Property({ nullable: true })
+    location?: string
 
     constructor(person: Person, sourceType: SourceType, source: string) {
         this.id = crypto.randomUUID()

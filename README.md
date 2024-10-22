@@ -11,7 +11,34 @@ Create a database and add the hostname (sqlite_database.db) to `.env`
 Run `npm run start:dev` for development environment. Can set up your own API key in the `.env` file (project root).
 
 **Build Docker image**
-Run `docker build -t geo-estonia-public-figs/prod .` in the projects root directory.
+- **ARM:** Run `docker build -t geo-estonia-public-figs/prod .` in the projects root directory.
+- **X64:** Run `docker build --platform linux/amd64 --no-cache -t geo-estonia-public-figs/prod .` in the projects root directory.
+
+## Running the application via docker
+Run with:
+```shell
+docker run -p 3001:3001 -v $(pwd)/kaardirakendus.db:/app/kaardirakendus.db -e NODE_ENV=production --env-file .env --name kaardirakendus-backend geo-estonia-public-figs
+```
+
+Mounts the database volume. There isn't any migration tools set upped, so exec into docker container and run the [sql scripts](./src/assets/sql/)
+
+### SQLite configs
+
+[//]: # (TODO automate the sqlite database stuff)
+
+Download UUIDv4 extension:
+```shell
+wget -qO- "https://github.com/woile/sqlite-uuid/releases/download/0.4.0/libsqlite_uuid-$(uname -s)-$(uname -m).tar.gz" | tar xvz
+
+# add to path
+sudo mv libsqlite_uuid.so /usr/lib/
+
+# load the plugin with each session
+vim ~/.sqliterc
+# add this line to file created above
+.open database_name .db
+.load libsqlite_uuid 
+```
 
 ## Configuring a firewall
 Solid and short explanation of [nftables](https://www.youtube.com/watch?v=83_M2NRgUtg) <br>
@@ -92,11 +119,18 @@ erDiagram
         REAL y_coordinate
     }
 
+    full_name {
+        TEXT id PK
+        TEXT person_id FK
+        TEXT full_name
+        TEXT comment
+    }
+
     nickname {
         TEXT id PK
         TEXT person_id FK
         TEXT nickname
-        TEXT nickname_comment
+        TEXT comment
     }
 
     category {
@@ -125,9 +159,11 @@ erDiagram
         TEXT person_id FK
         TEXT source_type
         TEXT source
+        TEXT location
     }
 
 %% Relationships
+    person ||--o{ full_name: "has"
     person ||--o{ nickname: "has"
     person ||--o{ person_categories: "categorized as"
     person ||--o{ person_sub_categories: "sub-categorized as"

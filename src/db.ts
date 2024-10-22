@@ -6,8 +6,8 @@ import { PersonRepository } from "./modules/person/person.repository.js"
 import { Person } from "./modules/person/person.entity.js"
 import { SubCategoryRepository } from "./modules/sub-category/sub-category.repository.js"
 import { SubCategory } from "./modules/sub-category/sub-category.entity.js"
-import { SourceRepository } from "./modules/source/source.repository.js"
-import { Source } from "./modules/source/source.entity.js"
+import { SourceRepository } from "./modules/person/source/source.repository.js"
+import { Source } from "./modules/person/source/source.entity.js"
 
 export interface Services {
   orm: MikroORM
