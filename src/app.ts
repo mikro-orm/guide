@@ -59,6 +59,7 @@ export async function bootstrap(port = 3001, migrate = true) {
     await db.orm.close()
   })
 
+  //todo add /api prefix as well
   app.register(registerCategoryRoutes, { prefix: 'category' })
   app.register(registerPersonRoutes, { prefix: 'person' })
 

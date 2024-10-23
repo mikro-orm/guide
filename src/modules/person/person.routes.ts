@@ -122,4 +122,22 @@ export async function registerPersonRoutes(app: FastifyInstance) {
             return
         }
     })
+
+    app.get('/markers', async (request, reply) => {
+        try {
+            const markers = await db.person.findAll()
+
+            const simplifiedMarkers = markers.map(person => ({
+                xCoordinate: person.xCoordinate,
+                yCoordinate: person.yCoordinate,
+                title: `${person.firstName} ${person.lastName}`,
+                description: person.description,
+            }))
+            console.log(markers)
+
+            return reply.status(200).send(simplifiedMarkers)
+        } catch (e) {
+            reply.status(404).send({ message: 'no markers found!' })
+        }
+    })
 }
