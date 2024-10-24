@@ -33,8 +33,39 @@ export async function registerPersonRoutes(app: FastifyInstance) {
         }
     })
 
+    app.get('/search', async (request, reply) => {
+        const { name } = request.query as any
+        console.log(name)
+
+        try {
+            const searchTerm = `%${name}%`
+
+            //sadly sqlite doesn't support $ilike, so can't use it here, yikes..
+            const persons = await db.person
+                .createQueryBuilder('person')
+                .leftJoinAndSelect('person.nicknames', 'nicknames')
+                .where('LOWER(person.first_name) LIKE ?', [`%${searchTerm}%`])
+                .orWhere('LOWER(person.last_name) LIKE ?', [`%${searchTerm}%`])
+                .orWhere('LOWER(nicknames.nickname) LIKE ?', [`%${searchTerm}%`])
+                .getResultList()
+
+            const simplifiedPersons = persons.map(person => ({
+                xCoordinate: person.xCoordinate,
+                yCoordinate: person.yCoordinate,
+                title: `${person.firstName} ${person.lastName}`,
+                description: person.description,
+            }))
+
+            console.log(simplifiedPersons)
+
+            return reply.status(200).send(simplifiedPersons)
+        } catch (e) {
+            console.error('Error in /person/name route:', e)
+            reply.status(500).send({ message: 'Server error while fetching ' })
+        }
+    })
+
     app.post('/', async (request, reply) => {
-        console.log(request.headers)
         const apiKey: string | undefined = request.headers["x-api-key"] as string
         if (!apiKey) {
             app.log.warn(`Request made for saving a person, but no API key was provided!`, request.ip, request.id)
@@ -123,6 +154,7 @@ export async function registerPersonRoutes(app: FastifyInstance) {
         }
     })
 
+    //todo separate endpoint for markers ig and fetch only xCoordinate, yCoordinate and fullName from the db (as title)
     app.get('/markers', async (request, reply) => {
         try {
             const markers = await db.person.findAll()
@@ -133,7 +165,6 @@ export async function registerPersonRoutes(app: FastifyInstance) {
                 title: `${person.firstName} ${person.lastName}`,
                 description: person.description,
             }))
-            console.log(markers)
 
             return reply.status(200).send(simplifiedMarkers)
         } catch (e) {

@@ -23,7 +23,9 @@ export async function bootstrap(port = 3001, migrate = true) {
   }
 
   const app = fastify({
-    logger: true
+    logger: {
+      level: "info",
+    }
   })
 
   app.register(cors, {

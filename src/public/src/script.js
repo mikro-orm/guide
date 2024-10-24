@@ -199,6 +199,7 @@ function createCustomDivIcon() {
 // Define a function to fetch and create markers
 function loadMarkers() {
     fetch('http://34.88.153.11:3001/person/markers')
+    // fetch('http://127.0.0.1:3001/person/markers')
         .then(response => response.json())
         .then(markerData => {
             // Iterate over the marker data and create markers
@@ -281,7 +282,8 @@ searchbox.onInput("keyup", function (e) {
         if (map.getZoom() < 11){
             map.setZoom(11);
         }
-        const searchUrl = `http://34.88.153.11:3001/api/v1/person/searchByName?name=${value}`;
+        const searchUrl = `http://34.88.153.11:3001/person/search?name=${encodeURIComponent(value)}`;
+        // const searchUrl = `http://127.0.0.1:3001/person/search?name=${encodeURIComponent(value)}`;
 
         fetch(searchUrl)
             .then(response => response.json())
@@ -291,13 +293,8 @@ searchbox.onInput("keyup", function (e) {
                 // Clear the existing dropdown options
                 searchbox.clearItems();
 
-                // Add the persons as dropdown options
                 persons.forEach(person => {
-                    // if (person.varjunimi == null) {
-                    searchbox.addItem(person.eesnimi + " " + person.perekonnanimi);
-                    //   } else {
-                    //     searchbox.addItem(person.eesnimi + " " + person.perekonnanimi + " " + person.varjunimi);
-                    //   }
+                    searchbox.addItem(person.title)
                 });
 
                 // Add click event listener to search result items
