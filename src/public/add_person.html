@@ -23,11 +23,11 @@
       <input id="firstName" name="firstName" placeholder="Koidula" class="w-full p-2 border rounded">
     </div>
     <div>
-      <label for="fullNames" class="block">Täisnimi(/ed) (kui mitu, siis eralda komaga):</label>
+      <label for="fullNames" class="block">Täisnimi(ed) <i>(kui mitu, siis eralda komaga)</i>:</label>
       <input id="fullNames" name="fullNames" placeholder="Vabarn Anne,Vabarna Anne" class="w-full p-2 border rounded">
     </div>
     <div>
-      <label for="nicknames" class="block">Varjunimi(/ed) (kui mitu, siis eralda komaga):</label>
+      <label for="nicknames" class="block">Varjunimi(ed) <i>(kui mitu, siis eralda komaga)</i>:</label>
       <input id="nicknames" name="nicknames" placeholder="olin-100-kroonisel" class="w-full p-2 border rounded">
     </div>
     <div>
@@ -35,7 +35,7 @@
       <input id="dob" name="dateOfBirth" placeholder="11.11.1911" class="w-full p-2 border rounded">
     </div>
     <div>
-      <label for="birthplace" class="block">Kasvukoht:<span class="text-red-500">*</span></label>
+      <label for="birthplace" class="block">Sünnikoht:<span class="text-red-500">*</span></label>
       <input id="birthplace" name="birthplace" placeholder="Kadrioru loss, Tallinn" class="w-full p-2 border rounded">
     </div>
     <div>
@@ -52,7 +52,12 @@
       <textarea id="description" placeholder="minu imeline elulugu :)" name="description" rows="4" class="w-full p-2 border rounded"></textarea>
     </div>
     <div>
-      <label class="block">Erinevad allikas (see raamat vms oli, pilt):<span class="text-red-500">*</span></label>
+      <label for="occupation" class="block">Amet(id) <i>(pange kogu exceli rida, nii nagu on...)</i>:</label>
+      <input id="occupation" name="occupation" placeholder="kirjanik, luuletaja ja helilooja ja miskit veel" class="w-full p-2 border rounded">
+    </div>
+
+    <div>
+      <label class="block">Erinevad allikad (Pilt, Elulugu, Raamat):<span class="text-red-500">*</span></label>
       <div id="sourcesContainer"></div>
       <button type="button" id="addSource" class="p-2 bg-blue-500 text-white rounded mt-2">Lisa allikas</button>
     </div>
@@ -84,6 +89,7 @@
             this.birthplace = null
             this.dateOfDeath = null
             this.description = null
+            this.occupation = null
             this.xCoordinate = null
             this.yCoordinate = null
             this.categories = []
@@ -189,7 +195,7 @@
                 sourceInput.placeholder = 'Pildi URL'
                 locationInput.style.visibility = 'visible' // Show location input if the source is 'PILT'
             } else if (selectedType === 'ELULUGU') {
-                sourceInput.placeholder = 'Eluloo URL'
+                sourceInput.placeholder = 'Eluloo allika URL'
                 locationInput.style.visibility = 'hidden' // Hide location input for non-PILT types
             } else if (selectedType === 'RAAMAT') {
                 sourceInput.placeholder = 'Raamatu nimi'
@@ -248,6 +254,7 @@
         personDto.nicknames = document.querySelector('input[name="nicknames"]').value
             ? document.querySelector('input[name="nicknames"]').value.split(',').map(n => n.trim())
             : null
+        personDto.occupation = document.querySelector('input[name="occupation"]').value || null
         personDto.dateOfBirth = document.querySelector('input[name="dateOfBirth"]').value || null
         personDto.dateOfDeath = document.querySelector('input[name="dateOfDeath"]').value || null
 

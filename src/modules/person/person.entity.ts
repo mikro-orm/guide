@@ -41,6 +41,9 @@ export class Person {
     @Property({ nullable: true, fieldName: "description" })
     description?: string
 
+    @Property({ nullable: true, fieldName: "occupation" })
+    occupation?: string | null
+
     @Property({ fieldName: "x_coordinate", columnType: "real" })
     xCoordinate: number
 

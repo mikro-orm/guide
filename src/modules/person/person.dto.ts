@@ -7,6 +7,7 @@ export interface PersonDto {
     birthplace: string
     dateOfDeath: string | null
     description: string
+    occupation: string | null
     xCoordinate: number
     yCoordinate: number
     categories: string[]
@@ -27,6 +28,7 @@ export class PersonDtoCls {
     birthplace: string
     dateOfDeath: string | null
     description: string
+    occupation: string | null
     xCoordinate: number
     yCoordinate: number
     categories: string[]

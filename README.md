@@ -115,6 +115,7 @@ erDiagram
         TEXT birthplace
         TEXT date_of_death
         TEXT description
+        TEXT occupation
         REAL x_coordinate
         REAL y_coordinate
     }

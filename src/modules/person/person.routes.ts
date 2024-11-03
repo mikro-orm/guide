@@ -92,6 +92,7 @@ export async function registerPersonRoutes(app: FastifyInstance) {
             birthplace: personDto.birthplace,
             dateOfDeath: personDto.dateOfDeath ? personDto.dateOfDeath : undefined,
             description: personDto.description,
+            occupation: personDto.occupation ? personDto.occupation : undefined,
             xCoordinate: personDto.xCoordinate,
             yCoordinate: personDto.yCoordinate
         }))

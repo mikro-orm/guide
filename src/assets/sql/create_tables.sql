@@ -7,6 +7,7 @@ CREATE TABLE person
     birthplace    TEXT,
     date_of_death TEXT,
     description   TEXT,
+    occupation    TEXT, --is actually One-To-Many relationship but what do I know
     x_coordinate  REAL NOT NULL,
     y_coordinate  REAL NOT NULL
 );
