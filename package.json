@@ -9,23 +9,23 @@
   "homepage": "https://mikro-orm.io/docs/guide",
   "dependencies": {
     "@fastify/jwt": "^8.0.1",
-    "@mikro-orm/core": "^6.3.13",
-    "@mikro-orm/migrations": "^6.3.13",
+    "@mikro-orm/core": "^6.4.0",
+    "@mikro-orm/migrations": "^6.4.0",
     "@mikro-orm/sql-highlighter": "^1.0.1",
-    "@mikro-orm/sqlite": "^6.3.13",
-    "argon2": "^0.40.3",
+    "@mikro-orm/sqlite": "^6.4.0",
+    "argon2": "^0.41.1",
     "fastify": "^4.28.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@mikro-orm/cli": "^6.3.13",
-    "@mikro-orm/reflection": "^6.3.13",
-    "@mikro-orm/seeder": "^6.3.13",
-    "@types/node": "^20.14.11",
-    "@types/slug": "^5.0.8",
+    "@mikro-orm/cli": "^6.4.0",
+    "@mikro-orm/reflection": "^6.4.0",
+    "@mikro-orm/seeder": "^6.4.0",
+    "@types/node": "^22.9.0",
+    "@types/slug": "^5.0.9",
     "ts-node": "^10.9.2",
-    "typescript": "5.5.3",
-    "vitest": "^2.0.3"
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
   },
   "scripts": {
     "build": "tsc && npx mikro-orm-esm cache:generate --combined",
