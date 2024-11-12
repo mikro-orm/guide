@@ -1,6 +1,5 @@
 #!/bin/sh
 
-# DEPRECATE this pos
 set -e
 
 # Check if NODE_ENV is set, default to 'development' if not
@@ -11,39 +10,35 @@ else
   echo "NODE_ENV is set to '$NODE_ENV'"
 fi
 
-# Set SERVER_URL based on NODE_ENV
-if [ "$NODE_ENV" = "development" ]; then
-  SERVER_URL="http://127.0.0.1:3001"
+# Retrieve SERVER_HOST from environment variables
+if [ "$NODE_ENV" = "production" ]; then
+  if [ -z "$SERVER_HOST" ]; then
+    echo "SERVER_HOST not found in the environment. Exiting."
+    exit 1
+  fi
 else
-  : "${SERVER_URL:=http://127.0.0.1:3001}"  # Use provided SERVER_URL or default to localhost
+  SERVER_HOST="127.0.0.1"
 fi
-echo "Setting SERVER_URL to $SERVER_URL"
+echo "Setting SERVER_HOST to $SERVER_HOST"
 
-# Set file path based on NODE_ENV
-if [ "$NODE_ENV" = "development" ]; then
-  FILE_PATH="src/public/add_person.html"
+# Directory to search in
+TARGET_DIR="/app/src/public"
+
+if [ "$NODE_ENV" = "production" ]; then
+  for file in $TARGET_DIR; do
+    if [ -f "$file" ]; then
+      echo "Processing $file..."
+
+      # Replace all occurrences of '127.0.0.1' with SERVER_HOST
+      awk -v url="$SERVER_HOST" '{gsub(/127\.0\.0\.1/, url); print}' "$file" > "${file}.tmp" && mv "${file}.tmp" "$file"
+      
+      echo "Updated SERVER_HOST in $file"
+    fi
+  done
 else
-  FILE_PATH="/app/src/public/add_person.html"
+  echo "Running in development mode, no changes made to src/public files."
 fi
 
-# Check if the file exists and replace the placeholder
-if [ -f "$FILE_PATH" ]; then
-  echo "File exists. Content before replacement:"
-  cat "$FILE_PATH"
-
-  # Escape special characters in SERVER_URL
-  ESCAPED_SERVER_URL=$(printf '%s\n' "$SERVER_URL" | sed -e 's/[\/&]/\\&/g')
-  echo "Escaped SERVER_URL: $ESCAPED_SERVER_URL"
-
-  # Use awk instead of sed for more reliable replacement
-  awk -v url="$ESCAPED_SERVER_URL" '{gsub(/{{SERVER_URL}}/, url); print}' "$FILE_PATH" > "${FILE_PATH}.tmp" && mv "${FILE_PATH}.tmp" "$FILE_PATH"
-
-  echo "Updated SERVER_URL in $FILE_PATH"
-  echo "File content after replacement:"
-  cat "$FILE_PATH"
-else
-  echo "File not found: $FILE_PATH"
-fi
 
 # Execute remaining commands
 exec "$@"

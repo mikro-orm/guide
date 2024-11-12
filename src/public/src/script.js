@@ -198,8 +198,7 @@ function createCustomDivIcon() {
 // Fetch marker data from the backend API
 // Define a function to fetch and create markers
 function loadMarkers() {
-    fetch('http://34.88.153.11:3001/person/markers')
-    // fetch('http://127.0.0.1:3001/person/markers')
+    fetch('http://127.0.0.1:3001/person/markers')
         .then(response => response.json())
         .then(markerData => {
             // Iterate over the marker data and create markers
@@ -258,32 +257,30 @@ let searchbox = L.control.searchbox({
 
 // Close and clear searchbox 600ms after pressing "ENTER" in the search box
 searchbox.onInput("keyup", function (e) {
-    if (e.keyCode === 13) {
-        // map.setZoom(11);
+    getPersonByName(searchbox.getValue())
+    if (e.keyCode === 13 || e.keyCode === 27) {
         setTimeout(function () {
-            searchbox.hide();
-            searchbox.clear();
-        }, 600);
+            searchbox.hide()
+            searchbox.clear()
+        }, 300)
     }
 });
 
 // Close and clear searchbox 600ms after clicking the search button
 searchbox.onButton("click", function () {
+    getPersonByName(searchbox.getValue())
     setTimeout(function () {
-        // map.setZoom(11);
-        searchbox.hide();
-        searchbox.clear();
-    }, 600);
+        searchbox.hide()
+        searchbox.clear()
+    }, 300)
 });
 
-searchbox.onInput("keyup", function (e) {
-    let value = searchbox.getValue();
-    if (value !== "") {
+function getPersonByName(name) {
+    if (name !== "") {
         if (map.getZoom() < 11){
             map.setZoom(11);
         }
-        const searchUrl = `http://34.88.153.11:3001/person/search?name=${encodeURIComponent(value)}`;
-        // const searchUrl = `http://127.0.0.1:3001/person/search?name=${encodeURIComponent(value)}`;
+        const searchUrl = `http://127.0.0.1:3001/person/search?name=${encodeURIComponent(name)}`;
 
         fetch(searchUrl)
             .then(response => response.json())
@@ -345,8 +342,7 @@ searchbox.onInput("keyup", function (e) {
     } else {
         searchbox.clearItems();
     }
-});
-
+}
 
 
 function findMarkerByTitle(title) {

@@ -9,12 +9,12 @@ import { Nickname } from "./nickname/nickname.entity.js"
 import { UUID } from "node:crypto"
 import { FullName } from "./fullName/full-name.entity.js"
 
-export async function registerPersonRoutes(app: FastifyInstance) {
+export async function registerPersonRoutes(app: FastifyInstance): Promise<void> {
     const db: Services = await initORM()
 
     app.get('/', async (request, reply) => {
         try {
-            const people = await db.person.findAll({ populate: ['nicknames', 'categories', 'sources', 'subCategories'] })
+            const people: Person[] = await db.person.findAll({ populate: ['nicknames', 'categories', 'sources', 'subCategories'] })
 
             return reply.status(200).send(people)
         } catch (e) {
@@ -25,7 +25,7 @@ export async function registerPersonRoutes(app: FastifyInstance) {
     app.get('/:id', async (request, reply) => {
         const { id } = request.params as { id: UUID }
         try {
-            const person = await db.person.findOneOrFail({ id }, { populate: ['nicknames', 'categories.name', 'sources', 'subCategories'] })
+            const person: Person = await db.person.findOneOrFail({ id }, { populate: ['nicknames', 'categories.name', 'sources', 'subCategories'] })
 
             return reply.status(200).send(person)
         } catch (error) {
@@ -34,8 +34,7 @@ export async function registerPersonRoutes(app: FastifyInstance) {
     })
 
     app.get('/search', async (request, reply) => {
-        const { name } = request.query as any
-        console.log(name)
+        const { name } = request.query as { name: string }
 
         try {
             const searchTerm = `%${name}%`
@@ -47,6 +46,7 @@ export async function registerPersonRoutes(app: FastifyInstance) {
                 .where('LOWER(person.first_name) LIKE ?', [`%${searchTerm}%`])
                 .orWhere('LOWER(person.last_name) LIKE ?', [`%${searchTerm}%`])
                 .orWhere('LOWER(nicknames.nickname) LIKE ?', [`%${searchTerm}%`])
+                .limit(15)
                 .getResultList()
 
             const simplifiedPersons = persons.map(person => ({
@@ -56,8 +56,6 @@ export async function registerPersonRoutes(app: FastifyInstance) {
                 description: person.description,
             }))
 
-            console.log(simplifiedPersons)
-
             return reply.status(200).send(simplifiedPersons)
         } catch (e) {
             console.error('Error in /person/name route:', e)
@@ -65,6 +63,9 @@ export async function registerPersonRoutes(app: FastifyInstance) {
         }
     })
 
+    /**
+     * DO NOT **fucking** touch this aight?!
+     */
     app.post('/', async (request, reply) => {
         const apiKey: string | undefined = request.headers["x-api-key"] as string
         if (!apiKey) {
@@ -155,21 +156,98 @@ export async function registerPersonRoutes(app: FastifyInstance) {
         }
     })
 
-    //todo separate endpoint for markers ig and fetch only xCoordinate, yCoordinate and fullName from the db (as title)
+    /**
+     * Get people markers by query params, all available filters are:
+     * - `category` [**optional**] - filter by category, must be delimited by `,` (comma); e.g. `&category=MAJANDUS,TEADUS`
+     * - `subCategory` [**optional**] - filter by sub category, must be delimited by `,` (comma); e.g. `&subCategory=ehitus,kirjanuds`
+     * - `dateOfBirthStart` [**optional**] - filter by date of birth time range start, provide only year as `yyyy`; e.g. `&dateOfBirthStart=1850`
+     * - `dateOfBirthEnd` [**optional**] - filter by date of birth time range end, provide only year as `yyyy`; e.g. `&dateOfBirthEnd=1900`
+     * - `name` [**optional**] - filter by name as well; e.g. `&name=kädi`
+     *
+     * TODO if name is used then it should prob return all data, no?
+     *
+     * @example
+     * curl -X GET "http://localhost:3001/person/markers?category=MAJANDUS,KULTUUR&subCategory=ehitus,transport,tehnikateadused&name=nikolai" \
+     *      -H "Accept: application/json"
+     */
     app.get('/markers', async (request, reply) => {
-        try {
-            const markers = await db.person.findAll()
+        const { category, subCategory, dateOfBirthStart, dateOfBirthEnd, name } = request.query as {
+            category?: string
+            subCategory?: string
+            dateOfBirthStart?: string
+            dateOfBirthEnd?: string
+            name?: string
+        }
 
-            const simplifiedMarkers = markers.map(person => ({
+        console.log(category, subCategory, name, dateOfBirthStart, dateOfBirthEnd)
+
+        try {
+            const queryBuilder = db.em.createQueryBuilder(Person, 'person')
+                .select([
+                    'person.id',
+                    'person.firstName',
+                    'person.lastName',
+                    'person.dateOfBirth',
+                    'person.xCoordinate',
+                    'person.yCoordinate',
+                    'person.description',
+                ])
+                .leftJoinAndSelect('person.nicknames', 'nicknames')
+                .leftJoinAndSelect('person.categories', 'categories')
+                .leftJoinAndSelect('person.subCategories', 'subCategories')
+
+            if (name) {
+                const searchTerm: string = `%${name.toLowerCase()}%`
+                queryBuilder
+                    .where('LOWER(person.first_name) LIKE ?', [searchTerm])
+                    .orWhere('LOWER(person.last_name) LIKE ?', [searchTerm])
+                    .orWhere('LOWER(nicknames.nickname) LIKE ?', [searchTerm])
+            }
+
+            if (category) {
+                const categories: string[] = category.split(',').map(cat => cat.trim().toUpperCase())
+                queryBuilder.andWhere('categories.name IN (?)', [categories])
+            }
+
+            if (subCategory) {
+                const subCategories: string[] = subCategory.split(',').map(subCat => subCat.trim().toLowerCase())
+                queryBuilder.andWhere('subCategories.name IN (?)', [subCategories])
+            }
+
+            if (dateOfBirthStart || dateOfBirthEnd) {
+                let condition: string = ''
+                const params: any[] = []
+
+                if (dateOfBirthStart) {
+                    condition += `CAST(SUBSTR(person.date_of_birth, -4, 4) AS INTEGER) >= ?`
+                    params.push(parseInt(dateOfBirthStart, 10))
+                }
+                if (dateOfBirthEnd) {
+                    if (condition) condition += ' AND '
+                    condition += `CAST(SUBSTR(person.date_of_birth, -4, 4) AS INTEGER) <= ?`
+                    params.push(parseInt(dateOfBirthEnd, 10))
+                }
+
+                if (condition) {
+                    queryBuilder.andWhere(condition, params)
+                }
+            }
+
+            const persons: Person[] = await queryBuilder.getResultList()
+
+            //Only return frontend relevant data, remove description as well
+            const simplifiedPersons = persons.map(person => ({
+                id: person.id,
                 xCoordinate: person.xCoordinate,
                 yCoordinate: person.yCoordinate,
                 title: `${person.firstName} ${person.lastName}`,
-                description: person.description,
+                description: person.description, //TODO remove in the future
             }))
 
-            return reply.status(200).send(simplifiedMarkers)
+            return reply.status(200).send(simplifiedPersons)
         } catch (e) {
-            reply.status(404).send({ message: 'no markers found!' })
+            console.error('Error in /person/search route:', e)
+            reply.status(500).send({ message: `Server error while fetching people based on the following filters: ` })
         }
     })
 }
