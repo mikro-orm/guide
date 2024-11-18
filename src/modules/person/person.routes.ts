@@ -179,7 +179,7 @@ export async function registerPersonRoutes(app: FastifyInstance): Promise<void> 
             name?: string
         }
 
-        console.log(category, subCategory, name, dateOfBirthStart, dateOfBirthEnd)
+        // console.log(category, subCategory, name, dateOfBirthStart, dateOfBirthEnd)
 
         try {
             const queryBuilder = db.em.createQueryBuilder(Person, 'person')
