@@ -1,126 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kaardirakendus</title>
-  <style id="dynamic-styles"></style>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kaardirakendus</title>
+    <style id="dynamic-styles"></style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
 
-  <!-- MarkerCluster -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+    <!-- MarkerCluster -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
 
-  <!-- search -->
-  <link href="styles/animatedSearchBox.css" rel="stylesheet">
-  <script src="src/animatedSearchBox.js"></script>
+    <!-- search -->
+    <link href="styles/animatedSearchBox.css" rel="stylesheet" />
+    <script src="src/animatedSearchBox.js"></script>
 
-  <!-- images -->
-   <link rel="icon" type="image/png" href="img/search_icon.png">
+    <!-- images -->
+    <link rel="icon" type="image/png" href="img/search_icon.png" />
 
-  <!-- styles -->
-  <link rel="stylesheet" href="styles/styles.css" />
-</head>
+    <!-- styles -->
+    <link rel="stylesheet" href="styles/styles.css" />
+  </head>
 
-<body>
-<svg xmlns="http://www.w3.org/2000/svg" style="display: none">
-  <symbol id="icon-arrow-left" viewBox="0 0 24 24">
-    <path d="M15.422 16.594 14.016 18l-6-6 6-6 1.406 1.406L10.828 12z" />
-  </symbol>
-  <symbol id="icon-clear" viewBox="0 0 24 24">
-    <path d="M18.984 6.422 13.406 12l5.578 5.578-1.406 1.406L12 13.406l-5.578 5.578-1.406-1.406L10.594 12 5.016 6.422l1.406-1.406L12 10.594l5.578-5.578z" />
-  </symbol>
-  <symbol id="icon-email" viewBox="0 0 24 24">
-    <path d="M20.016 8.016V6L12 11.016 3.984 6v2.016L12 12.985zm0-4.032q.797 0 1.383.609t.586 1.406v12q0 .797-.586 1.406t-1.383.609H3.985q-.797 0-1.383-.609t-.586-1.406v-12q0-.797.586-1.406t1.383-.609h16.031z" />
-  </symbol>
-  <symbol id="icon-menu" viewBox="0 0 24 24">
-    <path d="M3 13h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0-6h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0 12h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2z" />
-  </symbol>
-  <symbol id="icon-person" viewBox="0 0 24 24">
-    <path d="M12 14.016q2.531 0 5.273 1.102t2.742 2.883v2.016H3.984v-2.016q0-1.781 2.742-2.883t5.273-1.102zM12 12q-1.641 0-2.813-1.172T8.015 8.015t1.172-2.836T12 3.984t2.813 1.195 1.172 2.836-1.172 2.813T12 12z" />
-  </symbol>
-  <symbol id="icon-download" viewBox="0 0 24 24">
-    <path d="M19,18H5V16H19M19,11H15V3H9V11H5L12,18L19,11Z" />
-  </symbol>
-  <!--  <symbol id="icon-search" viewBox="0 0 24 24">-->
-  <!--    <path d="M17.9 16.3l3.5 3.5-1.4 1.4-3.5-3.5c-1.4.9-3 1.4-4.7 1.4C4.5 20 0 15.5 0 10S4.5 0 10 0s10 4.5 10 10c0 1.8-.5 3.4-1.4 4.7zM10 2C5.6 2 2 5.6 2 10s3.6 8 8 8 8-3.6 8-8c0-4.4-3.6-8-8-8z" />-->
-  <!--  </symbol>-->
-</svg>
-<div class="sidebar">
-  <button aria-label="close sidebar" type="button" class="close-button">
-    <svg>
-      <use xlink:href="#icon-clear" />
+  <body>
+    <select id="categoryDropdown">
+      <option value="">Vali kategooria</option>
+    </select>
+
+    <select id="subcategoryDropdown" disabled>
+      <option value="">Vali alamkategooria</option>
+    </select>
+
+    <label for="dobStart">Sünnikuupäeva algus (aasta):</label>
+    <input type="text" id="dobStart" placeholder="YYYY" maxlength="4" />
+
+    <label for="dobEnd">Sünnikuupäeva lõpp (aasta):</label>
+    <input type="text" id="dobEnd" placeholder="YYYY" maxlength="4" />
+
+    <button id="applyFiltersButton">Rakenda filtrid</button>
+    
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
+      <symbol id="icon-arrow-left" viewBox="0 0 24 24">
+        <path d="M15.422 16.594 14.016 18l-6-6 6-6 1.406 1.406L10.828 12z" />
+      </symbol>
+      <symbol id="icon-clear" viewBox="0 0 24 24">
+        <path
+          d="M18.984 6.422 13.406 12l5.578 5.578-1.406 1.406L12 13.406l-5.578 5.578-1.406-1.406L10.594 12 5.016 6.422l1.406-1.406L12 10.594l5.578-5.578z"
+        />
+      </symbol>
+      <symbol id="icon-email" viewBox="0 0 24 24">
+        <path
+          d="M20.016 8.016V6L12 11.016 3.984 6v2.016L12 12.985zm0-4.032q.797 0 1.383.609t.586 1.406v12q0 .797-.586 1.406t-1.383.609H3.985q-.797 0-1.383-.609t-.586-1.406v-12q0-.797.586-1.406t1.383-.609h16.031z"
+        />
+      </symbol>
+      <symbol id="icon-menu" viewBox="0 0 24 24">
+        <path
+          d="M3 13h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0-6h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2zm0 12h18a1 1 0 0 0 0-2H3a1 1 0 0 0 0 2z"
+        />
+      </symbol>
+      <symbol id="icon-person" viewBox="0 0 24 24">
+        <path
+          d="M12 14.016q2.531 0 5.273 1.102t2.742 2.883v2.016H3.984v-2.016q0-1.781 2.742-2.883t5.273-1.102zM12 12q-1.641 0-2.813-1.172T8.015 8.015t1.172-2.836T12 3.984t2.813 1.195 1.172 2.836-1.172 2.813T12 12z"
+        />
+      </symbol>
+      <symbol id="icon-download" viewBox="0 0 24 24">
+        <path d="M19,18H5V16H19M19,11H15V3H9V11H5L12,18L19,11Z" />
+      </symbol>
+      <!--  <symbol id="icon-search" viewBox="0 0 24 24">-->
+      <!--    <path d="M17.9 16.3l3.5 3.5-1.4 1.4-3.5-3.5c-1.4.9-3 1.4-4.7 1.4C4.5 20 0 15.5 0 10S4.5 0 10 0s10 4.5 10 10c0 1.8-.5 3.4-1.4 4.7zM10 2C5.6 2 2 5.6 2 10s3.6 8 8 8 8-3.6 8-8c0-4.4-3.6-8-8-8z" />-->
+      <!--  </symbol>-->
     </svg>
-  </button>
+    <div class="sidebar">
+      <button aria-label="close sidebar" type="button" class="close-button">
+        <svg>
+          <use xlink:href="#icon-clear" />
+        </svg>
+      </button>
 
-  <ul class="sidebar-menu">
-    <li class="menu-item" data-item="menu">
-      <svg><use xlink:href="#icon-menu"></use></svg>
-    </li>
-    <li class="menu-item" data-item="person">
-      <svg><use xlink:href="#icon-person"></use></svg>
-    </li>
-    <li class="menu-item" data-item="email">
-      <svg><use xlink:href="#icon-email"></use></svg>
-    </li>
-    <!--    <li class="menu-item" data-item="search">-->
-    <!--      <svg><use xlink:href="#icon-search"></use></svg>-->
-    <!--    </li>-->
-    <li class="menu-item" data-item="download">
-      <svg><use xlink:href="#icon-download"></use></svg>
-    </li>
-  </ul>
+      <ul class="sidebar-menu">
+        <li class="menu-item" data-item="menu">
+          <svg><use xlink:href="#icon-menu"></use></svg>
+        </li>
+        <li class="menu-item" data-item="person">
+          <svg><use xlink:href="#icon-person"></use></svg>
+        </li>
+        <li class="menu-item" data-item="email">
+          <svg><use xlink:href="#icon-email"></use></svg>
+        </li>
+        <!--    <li class="menu-item" data-item="search">-->
+        <!--      <svg><use xlink:href="#icon-search"></use></svg>-->
+        <!--    </li>-->
+        <li class="menu-item" data-item="download">
+          <svg><use xlink:href="#icon-download"></use></svg>
+        </li>
+      </ul>
 
-  <div class="sidebar-content">
-    <div class="item-content" id="menu">
-      <h2>Natuke meist</h2>
-      <div class="content">
-        Oleme informaatika esmakursuse tudengid Tallinna Ülikoolist. Meie grupp koosneb viiest inimesest. Kahest digimeedia suuna tudengist: Susanna Veskist ja Kristiin Marleen Suikist. Ja ka kolmest tarkvaraarenduse suuna tudengist: Jan Henrik Levertandist, Roland Siltist ning meie grupijuhist, Sander Nõlvakust. See projekt, "Eesti avalike tegelaste sünnigeograafia kaart", on koostatud kooli poolt pakutud praktika raames. Eesmärgiks on rikastada Eesti kultuuri ja hoida elus mälestusi meie riigi avalike elu tegelastest. Kõik, kes kaardil on, on võetud toimetaja Richard Kleisi poolt koostatud teosest "Eesti avalikud tegelased". Meile esitas tellimuse Kädi Riismaa, kes on Tallinna Ülikoolis digitehnoloogia instituudis teabehalduse lektor ning ka teadatuntud dokumendihalduse spetsialist. Suured tänuavaldused meie õppejõududele: Jaagup Kippar, Andrus Rinde ning Inga Petuhhov.
-      </div>
-    </div>
-    <div class="item-content" id="person">
-      <h2>Admini sisselogimine</h2>
-      <div class="content">
-        <a href="http://localhost:8080/login">
-          <button class="custom-button" type="button">Admin</button>
-        </a>
-      </div>
-    </div>
-    <div class="item-content" id="email">
-      <h2>Anna tagasisidet!</h2>
-      <form id="emailForm" action="http://localhost:8080/api/v1/email/sendEmail" method="post">
-        Nimi:<input type="text" name="name" id="name"><br>
-        Jäta oma kommentaar siia:<br>
-        <textarea name="subject" id="subject" rows="4"></textarea><br>
-        <input type="submit" value="Saada">
-      </form>
-    </div>
-    <div class="item-content" id="download">
-      <h2>Lae alla</h2>
-      <button class="custom-button1" type="button" onclick="openAPIWindow()">Lae alla</button>
-    </div>
+      <div class="sidebar-content">
+        <div class="item-content" id="menu">
+          <h2>Natuke meist</h2>
+          <div class="content">
+            Oleme informaatika esmakursuse tudengid Tallinna Ülikoolist. Meie
+            grupp koosneb viiest inimesest. Kahest digimeedia suuna tudengist:
+            Susanna Veskist ja Kristiin Marleen Suikist. Ja ka kolmest
+            tarkvaraarenduse suuna tudengist: Jan Henrik Levertandist, Roland
+            Siltist ning meie grupijuhist, Sander Nõlvakust. See projekt, "Eesti
+            avalike tegelaste sünnigeograafia kaart", on koostatud kooli poolt
+            pakutud praktika raames. Eesmärgiks on rikastada Eesti kultuuri ja
+            hoida elus mälestusi meie riigi avalike elu tegelastest. Kõik, kes
+            kaardil on, on võetud toimetaja Richard Kleisi poolt koostatud
+            teosest "Eesti avalikud tegelased". Meile esitas tellimuse Kädi
+            Riismaa, kes on Tallinna Ülikoolis digitehnoloogia instituudis
+            teabehalduse lektor ning ka teadatuntud dokumendihalduse
+            spetsialist. Suured tänuavaldused meie õppejõududele: Jaagup Kippar,
+            Andrus Rinde ning Inga Petuhhov.
+          </div>
+        </div>
+        <div class="item-content" id="person">
+          <h2>Admini sisselogimine</h2>
+          <div class="content">
+            <a href="http://localhost:8080/login">
+              <button class="custom-button" type="button">Admin</button>
+            </a>
+          </div>
+        </div>
+        <div class="item-content" id="email">
+          <h2>Anna tagasisidet!</h2>
+          <form
+            id="emailForm"
+            action="http://localhost:8080/api/v1/email/sendEmail"
+            method="post"
+          >
+            Nimi:<input type="text" name="name" id="name" /><br />
+            Jäta oma kommentaar siia:<br />
+            <textarea name="subject" id="subject" rows="4"></textarea><br />
+            <input type="submit" value="Saada" />
+          </form>
+        </div>
+        <div class="item-content" id="download">
+          <h2>Lae alla</h2>
+          <button
+            class="custom-button1"
+            type="button"
+            onclick="openAPIWindow()"
+          >
+            Lae alla
+          </button>
+        </div>
 
-    <script>
-        function openAPIWindow() {
+        <script>
+          function openAPIWindow() {
             // Make API request to retrieve person data
             let apiURL = "http://localhost:8080/api/v1/marker/getMarkers";
             let newWindow = window.open(apiURL, "_blank");
             newWindow.focus();
-        }
-    </script>
-  </div>
-</div>
+          }
+        </script>
+      </div>
+    </div>
 
-<div id="map"></div>
-<script type="module" src="src/script.js"></script>
-<!--    <script src="./dist/bundle.js" defer></script>-->
+    <div id="map"></div>
+    <script type="module" src="src/script.js"></script>
+    <!--    <script src="./dist/bundle.js" defer></script>-->
 
-<div class="navbar-container">
-
-</div>
-</body>
+    <div class="navbar-container"></div>
+  </body>
 </html>
