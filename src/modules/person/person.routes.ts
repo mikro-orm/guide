@@ -236,7 +236,7 @@ export async function registerPersonRoutes(
         ])
         .leftJoinAndSelect("person.nicknames", "nicknames")
         .leftJoinAndSelect("person.categories", "categories")
-        .leftJoinAndSelect("person.subCategories", "sub_categories"); 
+        .leftJoinAndSelect("person.subCategories", "sub_categories");
 
       if (category && category.trim() !== "") {
         const categories: string[] = category
@@ -282,8 +282,10 @@ export async function registerPersonRoutes(
         firstName: person.firstName,
         xCoordinate: person.xCoordinate,
         yCoordinate: person.yCoordinate,
-        title: `${person.firstName} ${person.lastName}`,
-        description: person.description, 
+        title: person.firstName
+          ? `${person.firstName} ${person.lastName}` // If firstname exists in pop-up
+          : person.lastName, // If firstname doesnt exist in pop-up
+        description: person.description,
       }));
 
       return reply.status(200).send(simplifiedPersons);
