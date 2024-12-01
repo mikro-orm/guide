@@ -406,6 +406,10 @@ function loadMarkers(filters = {}) {
         popupContent.appendChild(titleElement);
         const bodyElement = document.createElement('div');
         bodyElement.innerHTML = description;
+        bodyElement.style.maxHeight = "200px";
+        bodyElement.style.overflowY = "auto";
+        bodyElement.style.padding = "10px";
+        bodyElement.style.border = "1px solid #ccc";
         popupContent.appendChild(bodyElement);
 
         marker.bindPopup(popupContent);
