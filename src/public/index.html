@@ -77,7 +77,7 @@
       </select>
 
       <label for="dobStart"></label>
-      <input type="text" id="dobStart" placeholder="Sünniaastavahemiku algus (YYYY)" maxlength="4" style="
+      <input type="text" id="dobStart" placeholder="Sünniaasta algus (aasta arv)" maxlength="4" style="
         margin-top: 10px;
         padding: 2px;
         width: 220px;
@@ -86,12 +86,12 @@
         background-color: rgba(255, 255, 255, 0.5);
         color: black;
         font-size: 1em;
-        cursor: pointer;
+        cursor: text;
         transition: background-color 0.3s ease;
         margin-bottom: 10px;"/>
 
       <label for="dobEnd"></label>
-      <input type="text" id="dobEnd" placeholder="Sünniaastavahemiku lõpp (YYYY)" maxlength="4" style="
+      <input type="text" id="dobEnd" placeholder="Sünniaasta lõpp (aasta arv)" maxlength="4" style="
         margin-top: 10px;
         padding: 2px;
         width: 220px;
@@ -100,11 +100,13 @@
         background-color: rgba(255, 255, 255, 0.5);
         color: black;
         font-size: 1em;
-        cursor: pointer;
+        cursor: text;
         transition: background-color 0.3s ease;
         margin-bottom: 10px;"/>
 
-      <button class="custom-button" id="applyFiltersButton">Rakenda filtrid</button>
+      <button class="home-filter-button" id="applyFiltersButton" disabled>Rakenda filtrid</button>
+
+      <button class="home-filter-button-remove" id="clearFiltersButton">Kustuta filtrid</button>
     </div>
 
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
@@ -150,12 +152,6 @@
         <li class="menu-item" data-item="person">
           <svg><use xlink:href="#icon-person"></use></svg>
         </li>
-        <li class="menu-item" data-item="email">
-          <svg><use xlink:href="#icon-email"></use></svg>
-        </li>
-        <!--    <li class="menu-item" data-item="search">-->
-        <!--      <svg><use xlink:href="#icon-search"></use></svg>-->
-        <!--    </li>-->
       </ul>
 
       <div class="sidebar-content">
@@ -171,41 +167,18 @@
           </div>
         </div>
         <div class="item-content" id="person">
-          <h2>Admini sisselogimine</h2>
+          <h2>Isikute sisestamine</h2>
           <div class="content">
-            <a href="http://localhost:8080/login">
-              <button class="custom-button" type="button">Admin</button>
+            <a href="http://127.0.0.1:3001/add_person.html">
+              <button class="home-filter-button" type="button">Admin</button>
             </a>
           </div>
         </div>
-        <div class="item-content" id="email">
-          <h2>Anna tagasisidet!</h2>
-          <form
-            id="emailForm"
-            action="http://localhost:8080/api/v1/email/sendEmail"
-            method="post"
-          >
-            Nimi:<input type="text" name="name" id="name" /><br />
-            Jäta oma kommentaar siia:<br />
-            <textarea name="subject" id="subject" rows="4"></textarea><br />
-            <input type="submit" value="Saada" />
-          </form>
-        </div>
-
-        <script>
-          function openAPIWindow() {
-            // Make API request to retrieve person data
-            let apiURL = "http://localhost:8080/api/v1/marker/getMarkers";
-            let newWindow = window.open(apiURL, "_blank");
-            newWindow.focus();
-          }
-        </script>
       </div>
     </div>
 
     <div id="map"></div>
     <script type="module" src="src/script.js"></script>
-    <!--    <script src="./dist/bundle.js" defer></script>-->
 
     <div class="navbar-container"></div>
   </body>

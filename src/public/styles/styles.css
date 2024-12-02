@@ -273,7 +273,7 @@ svg:not(:root) {
     background-color: rgb(31, 85, 31);
 }
 
-.custom-button {
+.home-filter-button {
     display: inline-block;
     padding: 7px 14px;
     background-color: rgb(37,108,37);
@@ -287,14 +287,19 @@ svg:not(:root) {
     margin-top: 10px;
 }
 
-.custom-button:hover {
+.home-filter-button:hover {
     background-color: rgb(31, 85, 31);
 }
 
-.custom-button1 {
+.home-filter-button:disabled {
+    background-color: rgb(37,108,37);
+    cursor: not-allowed;
+}
+
+.home-filter-button-remove {
     display: inline-block;
     padding: 7px 14px;
-    background-color: rgb(37,108,37);
+    background-color: rgb(198, 18, 30);
     color: white;
     text-align: center;
     text-decoration: none;
@@ -302,9 +307,9 @@ svg:not(:root) {
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
-.custom-button1:hover {
-    background-color: #415a77;
+.home-filter-button-remove:hover {
+    background-color: rgb(232, 0, 60);
 }

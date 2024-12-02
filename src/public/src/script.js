@@ -122,47 +122,6 @@ function closeSidebar() {
   activeContent.classList.remove("active-content");
 }
 
-// -------------------------------------------------------- //
-// --------------- Modify styles for layers --------------- //
-// -------------------------------------------------------- //
-// function setStyles(selectedLayer) {
-//   let sidebar = document.querySelector(".sidebar");
-//   let sidebartext = document.querySelector(".sidebar-content");
-//   let sidebarelements = document.querySelector(".sidebar svg");
-//
-//   if (selectedLayer === "Klassika") {
-//     sidebar.style.background = "#fff"; // Light color
-//     sidebartext.style.color = "black";
-//     sidebarelements.style.fill = "#3f3f3f";
-//     document.getElementById("dynamic-styles").textContent = ".sidebar::before { background: #64a1e8; }";
-//     sidebar.classList.add("klassika");
-//     sidebar.classList.remove("dark-mode");
-//   } else if (selectedLayer === "Dark mode") {
-//     sidebar.style.background = "#415a77"; // Dark color
-//     sidebartext.style.color = "#ffffff";
-//     sidebarelements.style.fill = "#ccc";
-//     document.getElementById("dynamic-styles").textContent = ".sidebar::before { background: #163c48; }";
-//     sidebar.classList.add("dark-mode");
-//     sidebar.classList.remove("klassika");
-//
-//     // Additional code for dark mode marker color
-//     let markerIcons = document.querySelectorAll(".circle-icon");
-//     for (let i = 0; i < markerIcons.length; i++) {
-//       markerIcons[i].style.backgroundColor = "purple";
-//     }
-//   }
-// }
-//
-// map.on("baselayerchange", function(event) {
-//   let selectedLayer = event.name;
-//   setStyles(selectedLayer);
-// });
-//
-// // Set initial styles when the page loads
-// document.addEventListener("DOMContentLoaded", function() {
-//   setStyles("Klassika");
-// });
-
 // ------------------------------------------------------------ //
 // ------------------ Marker/Cluster config ------------------- //
 // ------------------------------------------------------------ //
@@ -248,54 +207,7 @@ const compareToArrays = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // ---------------------------------------------------- //
 // MiniMap
 const osm2 = new L.TileLayer(osmUrl, { minZoom: 0, maxZoom: 13 });
-const miniMap = new L.Control.MiniMap(osm2, { toggleDisplay: true }).addTo(map);
-
-// ---------------------------------------------------- //
-// ----------------------- Email ---------------------- //
-// ---------------------------------------------------- //
-
-// Add an event listener to the form submission
-document
-  .getElementById("emailForm")
-  .addEventListener("submit", function (event) {
-    event.preventDefault(); // Prevent the default form submission behavior
-
-    const name = document.getElementById("name").value;
-    const subject = document.getElementById("subject").value;
-
-    // Create an object with the necessary data from your form
-    const emailRequest = {
-      recipient: "1521e4565f2885@inbox.mailtrap.io",
-      name: name,
-      subject: subject,
-    };
-    console.log(emailRequest);
-
-    // Send the POST request to the backend
-    fetch("http://localhost:8080/api/v1/email/sendEmail", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(emailRequest),
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log("Email sent successfully");
-          alert("Email sent successfully!");
-        } else {
-          console.log(response);
-          console.log("Failed to send email");
-          alert("Failed to send email. Please try again later.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        alert(
-          "An error occurred while sending the email. Please try again later."
-        );
-      });
-  });
+new L.Control.MiniMap(osm2, { toggleDisplay: true }).addTo(map);
 
 // ------------------------------------------------------ //
 // ---------------------- Filtering ----------------------//
@@ -307,6 +219,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateOfBirthStartInput = document.getElementById('dobStart');
   const dateOfBirthEndInput = document.getElementById('dobEnd');
   const applyFiltersButton = document.getElementById('applyFiltersButton');
+  const clearFiltersButton = document.getElementById('clearFiltersButton');
+
+  const updateFilterButtons = () => {
+    const filters = getFilters()
+    const isAnyFilterSet = Object.keys(filters).length > 0
+
+    applyFiltersButton.disabled = !isAnyFilterSet
+    clearFiltersButton.style.display = isAnyFilterSet ? 'block' : 'none'
+  }
 
   // Fetch categories and populate the dropdown
   fetch('/category')
@@ -368,13 +289,32 @@ document.addEventListener('DOMContentLoaded', () => {
       subcategoryDropdown.innerHTML = '<option value="">Vali alamkategooria</option>';
       subcategoryDropdown.disabled = true;
     }
+
+    updateFilterButtons()
   });
+
+  [subcategoryDropdown, dateOfBirthStartInput, dateOfBirthEndInput].forEach(input => {
+    input.addEventListener('input', updateFilterButtons);
+  })
 
   // Add event listener to the "Apply Filters" button
   applyFiltersButton.addEventListener('click', () => {
     const filters = getFilters();
     loadMarkers(filters); // Call marker loading with filters
   });
+
+  clearFiltersButton.addEventListener('click', () => {
+    categoryDropdown.value = '';
+    subcategoryDropdown.value = '';
+    subcategoryDropdown.disabled = true
+    dateOfBirthStartInput.value = '';
+    dateOfBirthEndInput.value = '';
+
+    loadMarkers()
+    updateFilterButtons()
+  })
+
+  updateFilterButtons()
 });
 
 // ------------------------------------------------------- //
@@ -431,111 +371,95 @@ window.addEventListener('load', () => loadMarkers());
 // ---------------------------------------------------- //
 
 // Searchbox
-let searchbox = L.control
-  .searchbox({
+let searchbox = L.control.searchbox({
     position: "topright",
     expand: "left",
-  })
-  .addTo(map);
+}).addTo(map);
 
 // Close and clear searchbox 600ms after pressing "ENTER" in the search box
 searchbox.onInput("keyup", function (e) {
-  if (e.keyCode === 13) {
-    // map.setZoom(11);
-    setTimeout(function () {
-      searchbox.hide();
-      searchbox.clear();
-    }, 600);
+  getPersonByName(searchbox.getValue())
+  if (e.keyCode === 13 || e.keyCode === 27) {
+    setTimeout(() => {
+      searchbox.hide()
+      searchbox.clear()
+    }, 300)
   }
 });
 
 // Close and clear searchbox 600ms after clicking the search button
 searchbox.onButton("click", function () {
-  setTimeout(function () {
-    // map.setZoom(11);
-    searchbox.hide();
-    searchbox.clear();
-  }, 600);
+  getPersonByName(searchbox.getValue())
+  setTimeout(() => {
+    searchbox.hide()
+    searchbox.clear()
+  }, 300)
 });
 
-searchbox.onInput("keyup", function (e) {
-  let value = searchbox.getValue();
-  if (value !== "") {
+function getPersonByName(name) {
+  if (name !== "") {
     if (map.getZoom() < 11) {
       map.setZoom(11);
     }
-    const searchUrl = `http://34.88.153.11:3001/person/search?name=${encodeURIComponent(
-      value
-    )}`;
-    // const searchUrl = `http://127.0.0.1:3001/person/search?name=${encodeURIComponent(value)}`;
+    const searchUrl = `http://127.0.0.1:3001/person/search?name=${encodeURIComponent(name)}`;
 
     fetch(searchUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        const persons = data;
+        .then(response => response.json())
+        .then(data => {
+          const persons = data;
 
-        // Clear the existing dropdown options
-        searchbox.clearItems();
+          // Clear the existing dropdown options
+          searchbox.clearItems();
 
-        persons.forEach((person) => {
-          searchbox.addItem(person.title);
-        });
+          persons.forEach(person => {
+            searchbox.addItem(person.title)
+          });
 
-        // Add click event listener to search result items
-        const searchResultItems = searchbox.getValue();
+          // Add click event listener to search result items
+          const searchResultItems = searchbox.getValue();
 
-        if (typeof searchResultItems === "string") {
-          const selectedValue = searchResultItems;
-          const marker = findMarkerByTitle(selectedValue);
-          if (marker) {
-            const popup = marker.getPopup();
-            if (popup) {
-              // Check if the marker is part of a cluster
-              const cluster = marker.__parent;
-              if (cluster) {
-                console.log("Zoom level for search:", map.getZoom());
-                // Zoom to the cluster bounds
-                map.fitBounds(cluster.getBounds());
+          if (typeof searchResultItems === "string") {
+            const selectedValue = searchResultItems;
+            const marker = findMarkerByTitle(selectedValue);
+            if (marker) {
+              const popup = marker.getPopup();
+              if (popup) {
+                // Check if the marker is part of a cluster
+                const cluster = marker.__parent;
+                if (cluster) {
+                  console.log("Zoom level for search:", map.getZoom());
+                  // Zoom to the cluster bounds
+                  map.fitBounds(cluster.getBounds());
 
-                // Open the cluster after zooming
-                setTimeout(() => {
-                  cluster.spiderfy();
-                }, 100);
+                  // Open the cluster after zooming
+                  setTimeout(() => {
+                    cluster.spiderfy();
+                  }, 100);
 
-                // Open the marker's popup after a short delay
-                setTimeout(() => {
+                  // Open the marker's popup after a short delay
+                  setTimeout(() => {
+                    marker.openPopup();
+                  }, 200);
+                } else {
+                  // Center the map on the marker and open the popup
+                  map.setView(marker.getLatLng(), map.getMaxZoom());
                   marker.openPopup();
-                }, 200);
-              } else {
-                // Center the map on the marker and open the popup
-                map.setView(marker.getLatLng(), map.getMaxZoom());
-                marker.openPopup();
+                }
               }
             }
-            // else {
-            //   // console.error('Popup not found for marker:', marker);
-            // }
-          } else {
-            console.error("Marker not found for title:", selectedValue);
           }
-        } else if (Array.isArray(searchResultItems)) {
-          // Handle multiple search result items if needed
-          // ...
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+        })
+        .catch(error => {
+          console.error(error);
+        });
   } else {
     searchbox.clearItems();
   }
-});
+}
 
 function findMarkerByTitle(title) {
   const markerData = markers.getLayers();
-  // console.log("findMarkerByTitle method log: " + markerData);
   for (const marker of markerData) {
-    // console.log(marker.options.title)
     // see töötab, leiab inimese nimed (title) üles
     if (marker.options.title === title) {
       return marker;

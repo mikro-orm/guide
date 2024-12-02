@@ -19,9 +19,6 @@ if (process.env.NODE_ENV === 'production' && existsSync('./temp/metadata.json'))
 }
 
 export default defineConfig({
-  // for simplicity, we use the SQLite database, as it's available pretty much everywhere
-  //todo build script can't read process..env.DATABASE_HOSTNAME
-  // dbName: 'kaardirakendus.db',
   dbName: process.env.DATABASE_HOSTNAME,
   // folder based discovery setup, using common filename suffix
   entities: ['dist/**/*.entity.js'],

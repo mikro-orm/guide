@@ -65,24 +65,33 @@ export async function registerPersonRoutes(
     const { name } = request.query as { name: string };
 
     try {
-      const searchTerm = `%${name}%`;
+      const searchTerm = `%${name.toLowerCase()}%`;
 
       //sadly sqlite doesn't support $ilike, so can't use it here, yikes..
-      const persons = await db.person
-        .createQueryBuilder("person")
-        .leftJoinAndSelect("person.nicknames", "nicknames")
-        .where("LOWER(person.first_name) LIKE ?", [`%${searchTerm}%`])
-        .orWhere("LOWER(person.last_name) LIKE ?", [`%${searchTerm}%`])
-        .orWhere("LOWER(nicknames.nickname) LIKE ?", [`%${searchTerm}%`])
-        .limit(15)
-        .getResultList();
+      const query = `
+        SELECT
+          person.x_coordinate as xCoordinate,
+          person.y_coordinate as yCoordinate,
+          person.first_name AS firstName,
+          person.last_name AS lastName,
+          GROUP_CONCAT(nickname.nickname, ', ') AS nicknames
+        FROM person
+               LEFT JOIN nickname ON person.id = nickname.person_id
+        WHERE
+          LOWER(person.first_name) LIKE ?
+           OR LOWER(person.last_name) LIKE ?
+           OR LOWER(nickname.nickname) LIKE ?
+        GROUP BY person.id
+          LIMIT 15;
+      `;
 
-      const simplifiedPersons = persons.map((person) => ({
-        xCoordinate: person.xCoordinate,
-        yCoordinate: person.yCoordinate,
-        title: `${person.firstName} ${person.lastName}`,
-        description: person.description,
-      }));
+      const results = await db.em.getConnection().execute(query, [searchTerm, searchTerm, searchTerm])
+
+      const simplifiedPersons = results.map((row) => ({
+        xCoordinate: row.xCoordinate,
+        yCoordinate: row.yCoordinate,
+        title: `${row.firstName} ${row.lastName}`,
+      }))
 
       return reply.status(200).send(simplifiedPersons);
     } catch (e) {
@@ -242,7 +251,7 @@ export async function registerPersonRoutes(
         const categories: string[] = category
           .split(",")
           .map((cat) => cat.trim());
-        console.log("Applying category filter:", categories);
+        // console.debug("Applying category filter:", categories);
         queryBuilder.andWhere("categories.name IN (?)", [categories]);
       }
 
@@ -250,7 +259,7 @@ export async function registerPersonRoutes(
         const subCategories: string[] = subcategory
           .split(",")
           .map((subCat) => subCat.trim());
-        console.log("Applying subCategory filter:", subCategories);
+        // console.debug("Applying subCategory filter:", subCategories);
         queryBuilder.andWhere("sub_categories.name IN (?)", [subCategories]);
       }
 
@@ -274,7 +283,7 @@ export async function registerPersonRoutes(
       }
 
       const persons: Person[] = await queryBuilder.getResultList();
-      console.log("Persons found:", persons);
+      // console.debug("Persons found:", persons);
 
       const simplifiedPersons = persons.map((person) => ({
         id: person.id,
