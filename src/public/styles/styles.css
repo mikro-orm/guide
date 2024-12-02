@@ -30,7 +30,7 @@ body {
 .back-to-home {
     cursor: pointer;
     padding: 5px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.5);;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 65%);
 }
 
@@ -48,7 +48,7 @@ body {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background-color: green;
+    background-color: rgb(37,108,37);
 }
 
 /* Custom marker cluster styles */
@@ -84,7 +84,7 @@ svg:not(:root) {
     width: 46px;
     max-width: 480px;
     z-index: 99999;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.5);;
     box-shadow: none;
     overflow: hidden;
     border-right: 2px solid rgba(0, 0, 0, 0.2);
@@ -149,7 +149,7 @@ svg:not(:root) {
     left: 44px;
     width: 100%;
     height: 40px;
-    background: #64a1e8;
+    background: rgb(37,108,37);
 }
 
 .active-sidebar .sidebar::before {
@@ -176,10 +176,6 @@ svg:not(:root) {
     cursor: pointer;
 }
 
-.sidebar-menu li:last-child {
-    margin-top: auto;
-}
-
 .sidebar-menu li:hover svg {
     animation: rotation 500ms ease-in;
     transform-origin: center;
@@ -195,7 +191,7 @@ svg:not(:root) {
 }
 
 .active-item {
-    background: #64a1e8;
+    background: rgb(37,108,37);
 }
 
 .active-item svg {
@@ -263,7 +259,7 @@ svg:not(:root) {
 .item-content input[type="submit"] {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #64a1e8;
+    background-color: rgb(37,108,37);
     color: white;
     text-align: center;
     text-decoration: none;
@@ -274,13 +270,13 @@ svg:not(:root) {
 }
 
 .item-content input[type="submit"]:hover {
-    background-color: #415a77;
+    background-color: rgb(31, 85, 31);
 }
 
 .custom-button {
     display: inline-block;
     padding: 7px 14px;
-    background-color: #64a1e8;
+    background-color: rgb(37,108,37);
     color: white;
     text-align: center;
     text-decoration: none;
@@ -292,13 +288,13 @@ svg:not(:root) {
 }
 
 .custom-button:hover {
-    background-color: #415a77;
+    background-color: rgb(31, 85, 31);
 }
 
 .custom-button1 {
     display: inline-block;
     padding: 7px 14px;
-    background-color: #64a1e8;
+    background-color: rgb(37,108,37);
     color: white;
     text-align: center;
     text-decoration: none;
