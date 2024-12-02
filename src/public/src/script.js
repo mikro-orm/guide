@@ -260,7 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
           });
         }
       })
-      .catch(error => console.error('Error fetching subcategories:', error));
+      .catch(error => {
+        console.error('Error fetching subcategories:', error)
+      });
   }
 
   // Generate filters object based on user input
@@ -323,6 +325,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Load markers onto the map
 function loadMarkers(filters = {}) {
+  const loadingOverlay = document.getElementById('loadingOverlay')
+  loadingOverlay.style.display = 'flex' //add loading spinner
+
   const params = new URLSearchParams(filters).toString();
   const endpoint = `http://127.0.0.1:3001/person/markers${params ? `?${params}` : ''}`;
 
@@ -359,8 +364,12 @@ function loadMarkers(filters = {}) {
       });
 
       map.addLayer(markers);
+      loadingOverlay.style.display = 'none'
     })
-    .catch(error => console.error('Error fetching marker data:', error));
+    .catch(error => {
+      console.error('Error fetching marker data:', error)
+      loadingOverlay.style.display = 'none'
+    });
 }
 
 // Load initial markers without filters when the page loads

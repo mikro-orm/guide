@@ -83,7 +83,7 @@ svg:not(:root) {
     position: absolute;
     width: 46px;
     max-width: 480px;
-    z-index: 99999;
+    z-index: 999;
     background: rgba(255, 255, 255, 0.5);;
     box-shadow: none;
     overflow: hidden;
@@ -312,4 +312,41 @@ svg:not(:root) {
 
 .home-filter-button-remove:hover {
     background-color: rgb(232, 0, 60);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #1F551FFF;
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    animation: spin 2s linear infinite;
+}
+
+#loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+}
+
+.loading-text {
+    margin-top: 10px;
+    font-size: 18px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    font-family: Arial, sans-serif;
 }
