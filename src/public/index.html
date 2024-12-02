@@ -39,22 +39,74 @@
   </head>
 
   <body>
-    <select id="categoryDropdown">
-      <option value="">Vali kategooria</option>
-    </select>
+    <div style="
+      position: absolute;
+      top: 110px;
+      right: 0px;
+      z-index: 1000;
+      display: grid;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;">
+      <select id="categoryDropdown" class="dropdown" style="
+        margin-top: 10px;
+        padding: 2px;
+        border: 2px solid #189318;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        color: black;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px;">
+        <option value="">Vali kategooria</option>
+      </select>
 
-    <select id="subcategoryDropdown" disabled>
-      <option value="">Vali alamkategooria</option>
-    </select>
+      <select id="subcategoryDropdown" disabled style="
+        margin-top: 10px;
+        padding: 2px;
+        border: 2px solid #189318;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        color: black;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px;">
+        <option value="">Vali alamkategooria</option>
+      </select>
 
-    <label for="dobStart">Sünnikuupäeva algus (aasta):</label>
-    <input type="text" id="dobStart" placeholder="YYYY" maxlength="4" />
+      <label for="dobStart"></label>
+      <input type="text" id="dobStart" placeholder="Sünniaastavahemiku algus (YYYY)" maxlength="4" style="
+        margin-top: 10px;
+        padding: 2px;
+        width: 220px;
+        border: 2px solid #189318;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        color: black;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px;"/>
 
-    <label for="dobEnd">Sünnikuupäeva lõpp (aasta):</label>
-    <input type="text" id="dobEnd" placeholder="YYYY" maxlength="4" />
+      <label for="dobEnd"></label>
+      <input type="text" id="dobEnd" placeholder="Sünniaastavahemiku lõpp (YYYY)" maxlength="4" style="
+        margin-top: 10px;
+        padding: 2px;
+        width: 220px;
+        border: 2px solid #189318;
+        border-radius: 5px;
+        background-color: rgba(255, 255, 255, 0.5);
+        color: black;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: 10px;"/>
 
-    <button id="applyFiltersButton">Rakenda filtrid</button>
-    
+      <button class="custom-button" id="applyFiltersButton">Rakenda filtrid</button>
+    </div>
+
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
       <symbol id="icon-arrow-left" viewBox="0 0 24 24">
         <path d="M15.422 16.594 14.016 18l-6-6 6-6 1.406 1.406L10.828 12z" />
@@ -79,9 +131,7 @@
           d="M12 14.016q2.531 0 5.273 1.102t2.742 2.883v2.016H3.984v-2.016q0-1.781 2.742-2.883t5.273-1.102zM12 12q-1.641 0-2.813-1.172T8.015 8.015t1.172-2.836T12 3.984t2.813 1.195 1.172 2.836-1.172 2.813T12 12z"
         />
       </symbol>
-      <symbol id="icon-download" viewBox="0 0 24 24">
-        <path d="M19,18H5V16H19M19,11H15V3H9V11H5L12,18L19,11Z" />
-      </symbol>
+
       <!--  <symbol id="icon-search" viewBox="0 0 24 24">-->
       <!--    <path d="M17.9 16.3l3.5 3.5-1.4 1.4-3.5-3.5c-1.4.9-3 1.4-4.7 1.4C4.5 20 0 15.5 0 10S4.5 0 10 0s10 4.5 10 10c0 1.8-.5 3.4-1.4 4.7zM10 2C5.6 2 2 5.6 2 10s3.6 8 8 8 8-3.6 8-8c0-4.4-3.6-8-8-8z" />-->
       <!--  </symbol>-->
@@ -106,29 +156,18 @@
         <!--    <li class="menu-item" data-item="search">-->
         <!--      <svg><use xlink:href="#icon-search"></use></svg>-->
         <!--    </li>-->
-        <li class="menu-item" data-item="download">
-          <svg><use xlink:href="#icon-download"></use></svg>
-        </li>
       </ul>
 
       <div class="sidebar-content">
         <div class="item-content" id="menu">
           <h2>Natuke meist</h2>
           <div class="content">
-            Oleme informaatika esmakursuse tudengid Tallinna Ülikoolist. Meie
-            grupp koosneb viiest inimesest. Kahest digimeedia suuna tudengist:
-            Susanna Veskist ja Kristiin Marleen Suikist. Ja ka kolmest
-            tarkvaraarenduse suuna tudengist: Jan Henrik Levertandist, Roland
-            Siltist ning meie grupijuhist, Sander Nõlvakust. See projekt, "Eesti
-            avalike tegelaste sünnigeograafia kaart", on koostatud kooli poolt
-            pakutud praktika raames. Eesmärgiks on rikastada Eesti kultuuri ja
-            hoida elus mälestusi meie riigi avalike elu tegelastest. Kõik, kes
-            kaardil on, on võetud toimetaja Richard Kleisi poolt koostatud
-            teosest "Eesti avalikud tegelased". Meile esitas tellimuse Kädi
-            Riismaa, kes on Tallinna Ülikoolis digitehnoloogia instituudis
-            teabehalduse lektor ning ka teadatuntud dokumendihalduse
-            spetsialist. Suured tänuavaldused meie õppejõududele: Jaagup Kippar,
-            Andrus Rinde ning Inga Petuhhov.
+            Projekt kaardistab Eesti avaliku elu tegelaste sünnikohad ja tutvustava teabe interaktiivsel kaardil,
+            tuginedes biograafilistele teatmeteostele nagu "Eesti avalikud tegelased" (1932) ja "Eesti biograafiline
+            leksikon" (1926–1940). Eesmärk on laiendada teadmisi Eesti ajaloost ja kultuurist ning pakkuda koolidele
+            õppematerjali. Uus rakendus on vabavaraline ja see integreeritakse Eesti Rahvakultuuri Keskuse veebilehele.
+            Interaktiivne kaart peegeldab sünnikohti ja isikute tegevusalasid, pakkudes põhjalikku ja ajakohastatud
+            ülevaadet Eesti avaliku elu tegelastest.
           </div>
         </div>
         <div class="item-content" id="person">
@@ -151,16 +190,6 @@
             <textarea name="subject" id="subject" rows="4"></textarea><br />
             <input type="submit" value="Saada" />
           </form>
-        </div>
-        <div class="item-content" id="download">
-          <h2>Lae alla</h2>
-          <button
-            class="custom-button1"
-            type="button"
-            onclick="openAPIWindow()"
-          >
-            Lae alla
-          </button>
         </div>
 
         <script>
