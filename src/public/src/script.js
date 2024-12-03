@@ -5,18 +5,12 @@
 // --------------------------------------------------------------- //
 
 const osmLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
-const cartoDB = '<a href="http://cartodb.com/attributions">CartoDB</a>';
-// const stamenToner = <a href="http://maps.stamen.com">StamenToner</a>
 
 const osmUrl = "http://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const osmAttrib = `&copy; ${osmLink} Contributors`;
 
-const landUrl =
-  "https://{s}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png";
-const cartoAttrib = `&copy; ${osmLink} Contributors & ${cartoDB}`;
 
 const osmMap = L.tileLayer(osmUrl, { attribution: osmAttrib });
-const landMap = L.tileLayer(landUrl, { attribution: cartoAttrib });
 
 // ---------------------------------------------------- //
 // ------------------- Map config --------------------- //
@@ -43,12 +37,6 @@ L.control.scale({ imperial: false, maxWidth: 100 }).addTo(map);
 // osm layer
 osmMap.addTo(map);
 
-let baseLayers = {
-  Klassika: osmMap,
-  "Dark mode": landMap,
-};
-
-L.control.layers(baseLayers).addTo(map);
 
 // ------------------------------------------------------ //
 // ---------------------- Sidebar ----------------------- //
@@ -56,7 +44,6 @@ L.control.layers(baseLayers).addTo(map);
 // sidebar
 
 const menuItems = document.querySelectorAll(".menu-item");
-const sidebar = document.querySelector(".sidebar");
 const buttonClose = document.querySelector(".close-button");
 menuItems.forEach((item) => {
   item.addEventListener("click", (e) => {
