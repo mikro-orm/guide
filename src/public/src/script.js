@@ -214,90 +214,117 @@ new L.Control.MiniMap(osm2, { toggleDisplay: true }).addTo(map);
 // ------------------------------------------------------ //
 
 document.addEventListener('DOMContentLoaded', () => {
-  const categoryDropdown = document.getElementById('categoryDropdown');
-  const subcategoryDropdown = document.getElementById('subcategoryDropdown');
+  const categoryContainer = document.getElementById('categoryContainer');
+  const subcategoryContainer = document.getElementById('subcategoryContainer');
   const dateOfBirthStartInput = document.getElementById('dobStart');
   const dateOfBirthEndInput = document.getElementById('dobEnd');
   const applyFiltersButton = document.getElementById('applyFiltersButton');
   const clearFiltersButton = document.getElementById('clearFiltersButton');
 
   const updateFilterButtons = () => {
-    const filters = getFilters()
-    const isAnyFilterSet = Object.keys(filters).length > 0
+    const filters = getFilters();
+    const isAnyFilterSet = Object.keys(filters).length > 0;
+    applyFiltersButton.disabled = !isAnyFilterSet;
+    clearFiltersButton.style.display = isAnyFilterSet ? 'block' : 'none';
+  };
 
-    applyFiltersButton.disabled = !isAnyFilterSet
-    clearFiltersButton.style.display = isAnyFilterSet ? 'block' : 'none'
-  }
-
-  // Fetch categories and populate the dropdown
+  // Fetch categories and populate checkboxes
   fetch('/category')
     .then(response => response.json())
     .then(categories => {
       categories.forEach(category => {
-        const option = document.createElement('option');
-        option.value = category.name;
-        option.textContent = category.name;
-        categoryDropdown.appendChild(option);
+        const categoryCheckbox = document.createElement('input');
+        categoryCheckbox.type = 'checkbox';
+        categoryCheckbox.value = category.name;
+        categoryCheckbox.id = `category-${category.name}`;
+        
+        const label = document.createElement('label');
+        label.setAttribute('for', categoryCheckbox.id);
+        label.textContent = category.name;
+
+        // Append category checkbox and label to container
+        const categoryDiv = document.createElement('div');
+        categoryDiv.appendChild(categoryCheckbox);
+        categoryDiv.appendChild(label);
+        categoryContainer.appendChild(categoryDiv);
       });
     })
     .catch(error => console.error('Error fetching categories:', error));
 
-  // Fetch subcategories based on selected category
-  function fetchSubcategories(category) {
-    subcategoryDropdown.disabled = false;
-    subcategoryDropdown.innerHTML = '<option value="">Vali alamkategooria</option>';
+  // Fetch subcategories based on selected categories
+  function fetchSubcategories() {
+    subcategoryContainer.innerHTML = '';  // Reset subcategory container
 
+    const selectedCategories = Array.from(categoryContainer.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(checkbox => checkbox.value);
+
+    // Fetch categories again to get their subcategories
     fetch('/category')
       .then(response => response.json())
       .then(categories => {
-        const selectedCategory = categories.find(cat => cat.name === category);
-        if (selectedCategory) {
-          selectedCategory.subCategories.forEach(subcategory => {
-            const option = document.createElement('option');
-            option.value = subcategory;
-            option.textContent = subcategory;
-            subcategoryDropdown.appendChild(option);
-          });
-        }
+        const subcategories = new Set(); // Use a Set to avoid duplicate subcategories
+
+        // Loop through selected categories and collect their subcategories
+        selectedCategories.forEach(selectedCategory => {
+          const selectedCategoryData = categories.find(cat => cat.name === selectedCategory);
+          if (selectedCategoryData) {
+            selectedCategoryData.subCategories.forEach(subcategory => {
+              subcategories.add(subcategory); // Add subcategory to Set (no duplicates)
+            });
+          }
+        });
+
+        // Add the subcategories as checkboxes to the container
+        subcategories.forEach(subcategory => {
+          const subcategoryCheckbox = document.createElement('input');
+          subcategoryCheckbox.type = 'checkbox';
+          subcategoryCheckbox.value = subcategory;
+          subcategoryCheckbox.id = `subcategory-${subcategory}`;
+
+          const label = document.createElement('label');
+          label.setAttribute('for', subcategoryCheckbox.id);
+          label.textContent = subcategory;
+
+          const subcategoryDiv = document.createElement('div');
+          subcategoryDiv.appendChild(subcategoryCheckbox);
+          subcategoryDiv.appendChild(label);
+          subcategoryContainer.appendChild(subcategoryDiv);
+        });
       })
-      .catch(error => {
-        console.error('Error fetching subcategories:', error)
-      });
+      .catch(error => console.error('Error fetching subcategories:', error));
   }
 
   // Generate filters object based on user input
   function getFilters() {
-    const selectedCategory = categoryDropdown.value;
-    const selectedSubcategory = subcategoryDropdown.value;
+    const selectedCategories = Array.from(categoryContainer.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(checkbox => checkbox.value);
+    const selectedSubcategories = Array.from(subcategoryContainer.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(checkbox => checkbox.value);
     const dobStart = dateOfBirthStartInput.value.trim();
     const dobEnd = dateOfBirthEndInput.value.trim();
 
     const filters = {};
 
-    if (selectedCategory) filters.category = selectedCategory;
-    if (selectedSubcategory) filters.subcategory = selectedSubcategory;
+    if (selectedCategories.length > 0) filters.category = selectedCategories.join(',');
+    if (selectedSubcategories.length > 0) filters.subcategory = selectedSubcategories.join(',');
     if (dobStart) filters.dateOfBirthStart = dobStart;
     if (dobEnd) filters.dateOfBirthEnd = dobEnd;
 
     return filters;
   }
 
-  // Event listener for category change
-  categoryDropdown.addEventListener('change', event => {
-    const selectedCategory = event.target.value;
-    if (selectedCategory) {
-      fetchSubcategories(selectedCategory);
-    } else {
-      subcategoryDropdown.innerHTML = '<option value="">Vali alamkategooria</option>';
-      subcategoryDropdown.disabled = true;
-    }
-
-    updateFilterButtons()
+  // Event listener for category change (checkbox change)
+  categoryContainer.addEventListener('change', () => {
+    fetchSubcategories(); // Re-fetch subcategories when category changes
+    updateFilterButtons(); // Update filter buttons when category changes
   });
 
-  [subcategoryDropdown, dateOfBirthStartInput, dateOfBirthEndInput].forEach(input => {
+  // Event listeners for inputs (subcategory checkboxes, date inputs)
+  [dateOfBirthStartInput, dateOfBirthEndInput].forEach(input => {
     input.addEventListener('input', updateFilterButtons);
-  })
+  });
+
+  subcategoryContainer.addEventListener('change', updateFilterButtons);
 
   // Add event listener to the "Apply Filters" button
   applyFiltersButton.addEventListener('click', () => {
@@ -305,18 +332,17 @@ document.addEventListener('DOMContentLoaded', () => {
     loadMarkers(filters); // Call marker loading with filters
   });
 
+  // Clear filters and reset UI
   clearFiltersButton.addEventListener('click', () => {
-    categoryDropdown.value = '';
-    subcategoryDropdown.value = '';
-    subcategoryDropdown.disabled = true
+    categoryContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => checkbox.checked = false);
+    subcategoryContainer.innerHTML = ''; // Clear subcategories
     dateOfBirthStartInput.value = '';
     dateOfBirthEndInput.value = '';
+    loadMarkers(); // Reload markers without filters
+    updateFilterButtons(); // Update filter buttons visibility
+  });
 
-    loadMarkers()
-    updateFilterButtons()
-  })
-
-  updateFilterButtons()
+  updateFilterButtons(); // Initialize filter buttons state
 });
 
 // ------------------------------------------------------- //
