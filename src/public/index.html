@@ -39,80 +39,25 @@
   </head>
 
   <body>
-  <div id="loadingOverlay">
-    <div class="spinner"></div>
-    <p class="loading-text">Laeb andmeid...</p>
-  </div>
-
-    <div style="
-      position: absolute;
-      top: 110px;
-      right: 0px;
-      z-index: 1000;
-      display: grid;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;">
-      <select id="categoryDropdown" class="dropdown" style="
-        margin-top: 10px;
-        padding: 2px;
-        border: 2px solid #189318;
-        border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.5);
-        color: black;
-        font-size: 1em;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        margin-bottom: 10px;">
-        <option value="">Vali kategooria</option>
-      </select>
-
-      <select id="subcategoryDropdown" disabled style="
-        margin-top: 10px;
-        padding: 2px;
-        border: 2px solid #189318;
-        border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.5);
-        color: black;
-        font-size: 1em;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        margin-bottom: 10px;">
-        <option value="">Vali alamkategooria</option>
-      </select>
-
-      <label for="dobStart"></label>
-      <input type="text" id="dobStart" placeholder="Sünniaasta algus (aasta arv)" maxlength="4" style="
-        margin-top: 10px;
-        padding: 2px;
-        width: 220px;
-        border: 2px solid #189318;
-        border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.5);
-        color: black;
-        font-size: 1em;
-        cursor: text;
-        transition: background-color 0.3s ease;
-        margin-bottom: 10px;"/>
-
-      <label for="dobEnd"></label>
-      <input type="text" id="dobEnd" placeholder="Sünniaasta lõpp (aasta arv)" maxlength="4" style="
-        margin-top: 10px;
-        padding: 2px;
-        width: 220px;
-        border: 2px solid #189318;
-        border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.5);
-        color: black;
-        font-size: 1em;
-        cursor: text;
-        transition: background-color 0.3s ease;
-        margin-bottom: 10px;"/>
-
-      <button class="home-filter-button" id="applyFiltersButton" disabled>Rakenda filtrid</button>
-
-      <button class="home-filter-button-remove" id="clearFiltersButton">Kustuta filtrid</button>
+    <div id="loadingOverlay">
+      <div class="spinner"></div>
+      <p class="loading-text">Laeb andmeid...</p>
     </div>
+
+    <div id="filterContainer" class="filter-container">
+      <div id="categoryContainer" class="dropdown-container"></div>
+      <div id="subcategoryContainer" class="dropdown-container"></div>
+      
+      <div class="input-container">
+        <input type="text" id="dobStart" placeholder="Sünniaasta algus (aasta arv)" class="input-field" maxlength="4">
+        <input type="text" id="dobEnd" placeholder="Sünniaasta lõpp (aasta arv)" class="input-field" maxlength="4">
+      </div>
+      
+      <div class="button-container">
+        <button id="applyFiltersButton" class="button-primary">Rakenda filtrid</button>
+        <button id="clearFiltersButton" class="button-secondary">Kustuta filtrid</button>
+      </div>
+    </div>    
 
     <svg xmlns="http://www.w3.org/2000/svg" style="display: none">
       <symbol id="icon-arrow-left" viewBox="0 0 24 24">
@@ -138,7 +83,6 @@
           d="M12 14.016q2.531 0 5.273 1.102t2.742 2.883v2.016H3.984v-2.016q0-1.781 2.742-2.883t5.273-1.102zM12 12q-1.641 0-2.813-1.172T8.015 8.015t1.172-2.836T12 3.984t2.813 1.195 1.172 2.836-1.172 2.813T12 12z"
         />
       </symbol>
-
     </svg>
     <div class="sidebar">
       <button aria-label="close sidebar" type="button" class="close-button">
@@ -160,12 +104,15 @@
         <div class="item-content" id="menu">
           <h2>Natuke meist</h2>
           <div class="content">
-            Projekt kaardistab Eesti avaliku elu tegelaste sünnikohad ja tutvustava teabe interaktiivsel kaardil,
-            tuginedes biograafilistele teatmeteostele nagu "Eesti avalikud tegelased" (1932) ja "Eesti biograafiline
-            leksikon" (1926–1940). Eesmärk on laiendada teadmisi Eesti ajaloost ja kultuurist ning pakkuda koolidele
-            õppematerjali. Uus rakendus on vabavaraline ja see integreeritakse Eesti Rahvakultuuri Keskuse veebilehele.
-            Interaktiivne kaart peegeldab sünnikohti ja isikute tegevusalasid, pakkudes põhjalikku ja ajakohastatud
-            ülevaadet Eesti avaliku elu tegelastest.
+            Projekt kaardistab Eesti avaliku elu tegelaste sünnikohad ja
+            tutvustava teabe interaktiivsel kaardil, tuginedes biograafilistele
+            teatmeteostele nagu "Eesti avalikud tegelased" (1932) ja "Eesti
+            biograafiline leksikon" (1926–1940). Eesmärk on laiendada teadmisi
+            Eesti ajaloost ja kultuurist ning pakkuda koolidele õppematerjali.
+            Uus rakendus on vabavaraline ja see integreeritakse Eesti
+            Rahvakultuuri Keskuse veebilehele. Interaktiivne kaart peegeldab
+            sünnikohti ja isikute tegevusalasid, pakkudes põhjalikku ja
+            ajakohastatud ülevaadet Eesti avaliku elu tegelastest.
           </div>
         </div>
         <div class="item-content" id="person">
