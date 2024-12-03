@@ -352,24 +352,85 @@ function loadMarkers(filters = {}) {
       markers.clearLayers();
 
       markerData.forEach(data => {
-        const { xCoordinate, yCoordinate, title, description } = data;
+        const {
+          xCoordinate,
+          yCoordinate,
+          title,
+          description,
+          occupation,
+          dateOfBirth,
+          dateOfDeath,
+          nicknames,
+          categories,
+          subCategories,
+        } = data
 
         const marker = L.marker(new L.LatLng(xCoordinate, yCoordinate), {
           icon: createCustomDivIcon(),
           title: title,
         });
 
+        // Create popup content
         const popupContent = document.createElement('div');
+
+        // Add title
         const titleElement = document.createElement('h3');
         titleElement.textContent = title;
         popupContent.appendChild(titleElement);
-        const bodyElement = document.createElement('div');
-        bodyElement.innerHTML = description;
-        bodyElement.style.maxHeight = "200px";
-        bodyElement.style.overflowY = "auto";
-        bodyElement.style.padding = "10px";
-        bodyElement.style.border = "1px solid #ccc";
-        popupContent.appendChild(bodyElement);
+
+        // Add occupation
+        if (occupation) {
+          const occupationElement = document.createElement('p');
+          occupationElement.innerHTML = `<strong>Ametid:</strong> ${occupation}`;
+          occupationElement.style.margin = '5px 0'
+          popupContent.appendChild(occupationElement);
+        }
+
+        if (nicknames && nicknames.length > 0) {
+          const nicknameElement = document.createElement('p');
+          nicknameElement.innerHTML = `<strong>Varjunimed:</strong> ${nicknames.join(', ')}`;
+          nicknameElement.style.margin = '5px 0'
+          popupContent.appendChild(nicknameElement);
+        }
+
+        if (dateOfBirth) {
+          const dateOfBirthElement = document.createElement('p');
+          dateOfBirthElement.innerHTML = `<strong>Sünnikuupäev:</strong> ${dateOfBirth}`;
+          dateOfBirthElement.style.margin = '5px 0'
+          popupContent.appendChild(dateOfBirthElement);
+        }
+
+        if (dateOfDeath) {
+          const dateOfDeathElement = document.createElement('p');
+          dateOfDeathElement.innerHTML = `<strong>Surmaaeg:</strong> ${dateOfDeath}`;
+          dateOfDeathElement.style.margin = '5px 0'
+          popupContent.appendChild(dateOfDeathElement);
+        }
+
+        if (categories && categories.length > 0) {
+          const categorieElement = document.createElement('p');
+          categorieElement.innerHTML = `<strong>Kategooriad:</strong> ${categories.join(', ')}`;
+          categorieElement.style.margin = '5px 0'
+          popupContent.appendChild(categorieElement);
+        }
+
+        if (subCategories && subCategories.length > 0) {
+          const subCategoriesElement = document.createElement('p');
+          subCategoriesElement.innerHTML = `<strong>Alam Kategooriad:</strong> ${subCategories.join(', ')}`;
+          subCategoriesElement.style.margin = '5px 0'
+          popupContent.appendChild(subCategoriesElement);
+        }
+
+        // Add description
+        if (description) {
+          const descriptionElement = document.createElement('div');
+          descriptionElement.innerHTML = description;
+          descriptionElement.style.maxHeight = "200px";
+          descriptionElement.style.overflowY = "auto";
+          descriptionElement.style.padding = "10px";
+          descriptionElement.style.border = "1px solid #ccc";
+          popupContent.appendChild(descriptionElement);
+        }
 
         marker.bindPopup(popupContent);
         marker.on('click', clickZoom);

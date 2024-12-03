@@ -238,7 +238,9 @@ export async function registerPersonRoutes(
           "person.id",
           "person.firstName",
           "person.lastName",
+          "person.occupation",
           "person.dateOfBirth",
+          "person.dateOfDeath",
           "person.xCoordinate",
           "person.yCoordinate",
           "person.description",
@@ -283,19 +285,24 @@ export async function registerPersonRoutes(
       }
 
       const persons: Person[] = await queryBuilder.getResultList();
-      // console.debug("Persons found:", persons);
 
       const simplifiedPersons = persons.map((person) => ({
         id: person.id,
-        lastName: person.lastName,
-        firstName: person.firstName,
+        occupation: person.occupation,
+        dateOfBirth: person.dateOfBirth,
+        dateOfDeath: person.dateOfDeath,
         xCoordinate: person.xCoordinate,
         yCoordinate: person.yCoordinate,
         title: person.firstName
           ? `${person.firstName} ${person.lastName}` // If firstname exists in pop-up
           : person.lastName, // If firstname doesnt exist in pop-up
         description: person.description,
+        nicknames: person.nicknames.map((nickname) => nickname.nickname), // Assuming `nickname.name` exists
+        categories: person.categories.map((category) => category.name), // Assuming `category.name` exists
+        subCategories: person.subCategories.map((subCategory) => subCategory.name), // Assuming `subCategory.name` exists
       }));
+
+      console.log(simplifiedPersons.slice(0, 10))
 
       return reply.status(200).send(simplifiedPersons);
     } catch (e) {
