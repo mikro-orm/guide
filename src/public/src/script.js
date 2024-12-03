@@ -327,6 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dateOfBirthEndInput.value = '';
     loadMarkers(); // Reload markers without filters
     updateFilterButtons(); // Update filter buttons visibility
+    map.flyTo([lat, lng], zoom)
   });
 
   updateFilterButtons(); // Initialize filter buttons state
