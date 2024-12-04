@@ -57,9 +57,17 @@ menuItems.forEach((item) => {
     }
 
     // show content
-    showContent(target.dataset.item);
+    const dataItem = target.dataset.item;
+    showContent(dataItem);
+
     // add active class to menu item
     addRemoveActiveItem(target, "active-item");
+
+    // Additional logic for the person-dropdown menu item
+    if (dataItem === "person-dropdown") {
+      console.log("Person dropdown clicked");
+      fetchAndDisplayNames();
+    }
   });
 });
 
@@ -561,3 +569,124 @@ function clickZoom(e) {
     map.setView(cluster.getLatLng(), map.getMaxZoom() + 3);
   }
 }
+let cachedPeople = []; // Store the cached people data
+let namesFetched = false; // Flag to track whether names are already fetched
+
+// Function to fetch and display names (with caching)
+function fetchAndDisplayNames() {
+  const listContainer = document.getElementById('people-list');
+  const loadingOverlay = document.getElementById('loading-overlay'); // Reference to the loading overlay inside person-dropdown
+
+  // Show the loading overlay
+  loadingOverlay.classList.remove('hidden');
+
+  listContainer.innerHTML = ''; // Clear any existing content
+
+  // Check if data is already cached
+  if (cachedPeople.length > 0) {
+    // If cached, just display the names
+    populatePeopleList(cachedPeople);
+
+    // Hide the loading overlay
+    loadingOverlay.classList.add('hidden');
+  } else {
+    // Fetch the data from the API if not cached
+    fetch('http://127.0.0.1:3001/person')
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          cachedPeople = data; // Cache the data for future use
+          cachedPeople.sort((a, b) => {
+            const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
+            const nameB = `${b.firstName} ${b.lastName}`.toLowerCase();
+            return nameA.localeCompare(nameB); // Sort alphabetically
+          });
+          populatePeopleList(cachedPeople); // Display the sorted names
+
+          // Hide the loading overlay
+          loadingOverlay.classList.add('hidden');
+        })
+        .catch((error) => {
+          console.error('Error fetching names:', error);
+
+          // Hide the loading overlay even on error
+          loadingOverlay.classList.add('hidden');
+        });
+  }
+}
+
+// Function to populate the people list
+function populatePeopleList(data) {
+  const listContainer = document.getElementById('people-list');
+  listContainer.innerHTML = ''; // Clear any existing content
+
+  data.forEach((person) => {
+    const fullName = `${person.firstName} ${person.lastName}`;
+    if (fullName) {
+      const listItem = document.createElement('li');
+      listItem.textContent = fullName;
+      listItem.className = 'person-item';
+
+      // Add click event to zoom in on the marker
+      listItem.addEventListener('click', () => {
+        const { xCoordinate, yCoordinate } = person;
+        const latLng = new L.LatLng(xCoordinate, yCoordinate);
+        map.flyTo(latLng, map.getMaxZoom(), { duration: 1 });
+      });
+
+      listContainer.appendChild(listItem);
+    } else {
+      console.warn('Missing name for person:', person);
+    }
+  });
+}
+
+// Function to handle the sidebar menu click
+function setupSidebarButton() {
+  const peopleButton = document.querySelector('[data-item="person-dropdown"]');
+  peopleButton.addEventListener('click', () => {
+    if (!namesFetched) {
+      // Only fetch names if not already fetched
+      fetchAndDisplayNames();
+      namesFetched = true; // Mark as fetched
+    } else {
+      // Display cached names if already fetched
+      populatePeopleList(cachedPeople);
+    }
+  });
+}
+
+// Function to handle alphabet button clicks
+function setupAlphabetButtons() {
+  const alphabetButtons = document.querySelectorAll('.alphabet-letter');
+  alphabetButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const letter = button.getAttribute('data-letter');
+      scrollToLetter(letter); // Scroll to the names starting with the clicked letter
+    });
+  });
+}
+
+// Function to scroll to the first name starting with the selected letter
+function scrollToLetter(letter) {
+  const listContainer = document.getElementById('people-list');
+  const listItems = listContainer.getElementsByTagName('li');
+
+  for (let i = 0; i < listItems.length; i++) {
+    const fullName = listItems[i].textContent;
+    if (fullName.charAt(0).toUpperCase() === letter) {
+      listItems[i].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      break;
+    }
+  }
+}
+
+// Call setupSidebarButton and setupAlphabetButtons when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setupSidebarButton();
+  setupAlphabetButtons();
+});
