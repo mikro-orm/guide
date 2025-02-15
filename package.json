@@ -7,26 +7,27 @@
   "author": "Martin Adamek",
   "license": "MIT",
   "homepage": "https://mikro-orm.io/docs/guide",
+
   "dependencies": {
-    "@fastify/jwt": "^8.0.1",
-    "@mikro-orm/core": "^6.4.0",
-    "@mikro-orm/migrations": "^6.4.0",
+    "@fastify/jwt": "^9.0.4",
+    "@mikro-orm/core": "^6.4.6",
+    "@mikro-orm/migrations": "^6.4.6",
+    "@mikro-orm/reflection": "^6.4.6",
+    "@mikro-orm/seeder": "^6.4.6",
     "@mikro-orm/sql-highlighter": "^1.0.1",
-    "@mikro-orm/sqlite": "^6.4.0",
+    "@mikro-orm/sqlite": "^6.4.6",
     "argon2": "^0.41.1",
-    "fastify": "^4.28.1",
-    "zod": "^3.23.8"
+    "fastify": "^5.2.1",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@mikro-orm/cli": "^6.4.0",
-    "@mikro-orm/reflection": "^6.4.0",
-    "@mikro-orm/seeder": "^6.4.0",
-    "@types/node": "^22.9.0",
-    "@types/slug": "^5.0.9",
+    "@mikro-orm/cli": "^6.4.6",
+    "@types/node": "^22.13.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.4"
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
   },
+
   "scripts": {
     "build": "tsc && npx mikro-orm-esm cache:generate --combined",
     "start": "node --no-warnings=ExperimentalWarning --loader ts-node/esm src/server.ts",

@@ -30,4 +30,4 @@ export default defineConfig({
   // for highlighting the SQL queries
   highlighter: new SqlHighlighter(),
   ...options,
-});
+}) as Options;
