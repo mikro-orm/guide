@@ -6,10 +6,11 @@
         "id": {
           "name": "id",
           "type": "integer",
-          "unsigned": true,
+          "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "created_at": {
@@ -19,7 +20,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -29,7 +30,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "name": {
@@ -65,10 +66,11 @@
         "id": {
           "name": "id",
           "type": "integer",
-          "unsigned": true,
+          "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "created_at": {
@@ -78,7 +80,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -88,7 +90,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "full_name": {
@@ -98,6 +100,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "email": {
@@ -107,6 +110,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "password": {
@@ -116,6 +120,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "bio": {
@@ -125,6 +130,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "default": "''",
           "mappedType": "text"
         },
@@ -135,11 +141,22 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
+          "length": null,
           "mappedType": "json"
         }
       },
       "name": "user",
       "indexes": [
+        {
+          "columnNames": [
+            "email"
+          ],
+          "composite": false,
+          "keyName": "user_email_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "keyName": "primary",
           "columnNames": [
@@ -160,10 +177,11 @@
         "id": {
           "name": "id",
           "type": "integer",
-          "unsigned": true,
+          "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "created_at": {
@@ -173,7 +191,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -183,7 +201,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "slug": {
@@ -193,6 +211,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "title": {
@@ -202,6 +221,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "description": {
@@ -221,6 +241,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "text"
         },
         "author_id": {
@@ -230,6 +251,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         }
       },
@@ -287,8 +309,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "user",
-          "updateRule": "cascade"
+          "referencedTableName": "user"
         }
       },
       "nativeEnums": {}
@@ -298,10 +319,11 @@
         "id": {
           "name": "id",
           "type": "integer",
-          "unsigned": true,
+          "unsigned": false,
           "autoincrement": true,
           "primary": true,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "created_at": {
@@ -311,7 +333,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "updated_at": {
@@ -321,7 +343,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 0,
+          "length": null,
           "mappedType": "datetime"
         },
         "text": {
@@ -331,7 +353,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 1000,
+          "length": null,
           "mappedType": "text"
         },
         "article_id": {
@@ -341,6 +363,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "author_id": {
@@ -350,7 +373,18 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
         }
       },
       "name": "comment",
@@ -397,8 +431,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "article",
-          "updateRule": "cascade"
+          "referencedTableName": "article"
         },
         "comment_author_id_foreign": {
           "constraintName": "comment_author_id_foreign",
@@ -409,8 +442,7 @@
           "referencedColumnNames": [
             "id"
           ],
-          "referencedTableName": "user",
-          "updateRule": "cascade"
+          "referencedTableName": "user"
         }
       },
       "nativeEnums": {}
@@ -424,6 +456,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         },
         "tag_id": {
@@ -433,6 +466,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "length": null,
           "mappedType": "integer"
         }
       },
@@ -500,6 +534,12 @@
         }
       },
       "nativeEnums": {}
+    }
+  ],
+  "views": [
+    {
+      "name": "article_listing",
+      "definition": "\n    select a.slug, a.title, a.description, a.author_id as author,\n           u.full_name as author_name,\n           (select count(*) from comment c where c.article_id = a.id) as total_comments,\n           (select group_concat(distinct t.name) from article_tags at2\n              join tag t on t.id = at2.tag_id\n              where at2.article_id = a.id) as tags\n    from article a\n    join user u on u.id = a.author_id\n  "
     }
   ],
   "nativeEnums": {}

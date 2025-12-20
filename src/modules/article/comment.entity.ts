@@ -1,18 +1,20 @@
-import { Entity, ManyToOne, Property, Ref } from '@mikro-orm/sqlite';
-import { Article } from './article.entity.js';
+import { defineEntity, type InferEntity, p } from '@mikro-orm/sqlite';
+import { ArticleSchema } from './article.entity.js';
 import { User } from '../user/user.entity.js';
 import { BaseEntity } from '../common/base.entity.js';
 
-@Entity()
-export class Comment extends BaseEntity {
+export const CommentSchema = defineEntity({
+  name: 'Comment',
+  extends: BaseEntity,
+  properties: {
+    text: p.string(),
+    article: () => p.manyToOne(ArticleSchema).ref(),
+    author: () => p.manyToOne(User).ref(),
+    deletedAt: p.datetime().nullable(),
+  },
+  filters: {
+    softDelete: { name: 'softDelete', cond: { deletedAt: null }, default: true },
+  },
+});
 
-  @Property({ length: 1000 })
-  text!: string;
-
-  @ManyToOne()
-  article!: Ref<Article>;
-
-  @ManyToOne()
-  author!: Ref<User>;
-
-}
+export type Comment = InferEntity<typeof CommentSchema>;

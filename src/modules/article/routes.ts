@@ -1,7 +1,7 @@
-import { FastifyInstance } from 'fastify';
-import { wrap } from '@mikro-orm/sqlite';
+import { type FastifyInstance } from 'fastify';
+import { wrap, type EntityData } from '@mikro-orm/sqlite';
 import { initORM } from '../../db.js';
-import { Article } from './article.entity.js';
+import { type Article } from './article.entity.js';
 import { getUserFromToken, verifyArticlePermissions } from '../common/utils.js';
 
 export async function registerArticleRoutes(app: FastifyInstance) {
@@ -63,7 +63,7 @@ export async function registerArticleRoutes(app: FastifyInstance) {
     const params = request.params as { id: string };
     const article = await db.article.findOneOrFail(+params.id);
     verifyArticlePermissions(user, article);
-    wrap(article).assign(request.body as Article);
+    wrap(article).assign(request.body as EntityData<Article>);
     await db.em.flush();
 
     return article;

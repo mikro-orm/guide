@@ -22,7 +22,7 @@ export async function bootstrap(port = 3001, migrate = true) {
   });
 
   // register request context hook
-  app.addHook('onRequest', (request, reply, done) => {
+  app.addHook('onRequest', (_request, _reply, done) => {
     RequestContext.create(db.em, done);
   });
 
@@ -48,7 +48,7 @@ export async function bootstrap(port = 3001, migrate = true) {
     }
 
     app.log.error(error);
-    reply.status(500).send({ error: error.message });
+    reply.status(500).send({ error: (error as Error).message });
   });
 
   // shut down the connection when closing the app

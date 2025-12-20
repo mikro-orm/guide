@@ -1,8 +1,8 @@
-import { MikroORM, Options, EntityManager, EntityRepository } from '@mikro-orm/sqlite';
+import { MikroORM, type Options, EntityManager, EntityRepository } from '@mikro-orm/sqlite';
 import { User } from './modules/user/user.entity.js';
-import { Comment } from './modules/article/comment.entity.js';
-import { Article } from './modules/article/article.entity.js';
-import { Tag } from './modules/article/tag.entity.js';
+import { CommentSchema, type Comment } from './modules/article/comment.entity.js';
+import { ArticleSchema } from './modules/article/article.entity.js';
+import { TagSchema, type Tag } from './modules/article/tag.entity.js';
 import { UserRepository } from './modules/user/user.repository.js';
 import { ArticleRepository } from './modules/article/article.repository.js';
 import config from './mikro-orm.config.js';
@@ -33,9 +33,9 @@ export async function initORM(options?: Options): Promise<Services> {
   return cache = {
     orm,
     em: orm.em,
-    article: orm.em.getRepository(Article),
-    comment: orm.em.getRepository(Comment),
+    article: orm.em.getRepository(ArticleSchema),
+    comment: orm.em.getRepository(CommentSchema),
     user: orm.em.getRepository(User),
-    tag: orm.em.getRepository(Tag),
+    tag: orm.em.getRepository(TagSchema),
   };
 }

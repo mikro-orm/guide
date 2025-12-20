@@ -1,72 +1,63 @@
 import {
-  BeforeCreate, BeforeUpdate, Collection, Embeddable, Embedded,
-  Entity, EntityRepositoryType, EventArgs, OneToMany, Property,
+  defineEntity,
+  p,
+  ref,
+  type EventArgs,
+  type InferEntity,
 } from '@mikro-orm/sqlite';
 import { hash, verify } from 'argon2';
 import { BaseEntity } from '../common/base.entity.js';
-import { Article } from '../article/article.entity.js';
+import { ArticleSchema } from '../article/article.entity.js';
 import { UserRepository } from './user.repository.js';
 
-@Embeddable()
-export class Social {
+export const SocialSchema = defineEntity({
+  name: 'Social',
+  embeddable: true,
+  properties: {
+    twitter: p.string().nullable(),
+    facebook: p.string().nullable(),
+    linkedin: p.string().nullable(),
+  },
+});
 
-  @Property()
-  twitter?: string;
+export type Social = InferEntity<typeof SocialSchema>;
 
-  @Property()
-  facebook?: string;
+export const UserSchema = defineEntity({
+  name: 'User',
+  tableName: 'user',
+  repository: () => UserRepository,
+  extends: BaseEntity,
+  properties: {
+    fullName: p.string(),
+    email: p.string().unique().hidden(),
+    password: p.string().hidden().lazy().ref(),
+    bio: p.text().default(''),
+    articles: () => p.oneToMany(ArticleSchema).mappedBy('author').hidden(),
+    token: p.string().nullable().persist(false),
+    social: () => p.embedded(SocialSchema).object(true).nullable(),
+  },
+  hooks: {
+    beforeCreate: ['hashPassword'],
+    beforeUpdate: ['hashPassword'],
+  },
+});
 
-  @Property()
-  linkedin?: string;
+export class User extends UserSchema.class {
 
-}
-
-@Entity({ repository: () => UserRepository })
-export class User extends BaseEntity<'bio'> {
-
-  [EntityRepositoryType]?: UserRepository;
-
-  @Property()
-  fullName: string;
-
-  @Property({ hidden: true })
-  email: string;
-
-  @Property({ hidden: true, lazy: true })
-  password: string;
-
-  @Property({ type: 'text' })
-  bio = '';
-
-  @OneToMany(() => Article, article => article.author, { hidden: true })
-  articles = new Collection<Article>(this);
-
-  @Property({ persist: false })
-  token?: string;
-
-  @Embedded(() => Social, { object: true })
-  social?: Social;
-
-  constructor(fullName: string, email: string, password: string) {
-    super();
-    this.fullName = fullName;
-    this.email = email;
-    this.password = password;
-  }
-
-  @BeforeCreate()
-  @BeforeUpdate()
   async hashPassword(args: EventArgs<User>) {
     // hash only if the value changed
     const password = args.changeSet?.payload.password;
 
-    if (password) {
-      this.password = await hash(password);
+    if (typeof password === 'string') {
+      this.password = ref(await hash(password));
     }
   }
 
   async verifyPassword(password: string) {
-    return verify(this.password, password);
+    const hash = await this.password.loadOrFail();
+    return verify(hash, password);
   }
 
 }
+
+UserSchema.setClass(User);

@@ -1,6 +1,6 @@
 {
   "name": "@mikro-orm/getting-started",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "type": "module",
   "description": "MikroORM Getting Started guide",
   "repository": "https://github.com/mikro-orm/guide",
@@ -8,29 +8,30 @@
   "license": "MIT",
   "homepage": "https://mikro-orm.io/docs/guide",
   "dependencies": {
-    "@fastify/jwt": "^8.0.1",
-    "@mikro-orm/core": "^6.5.3",
-    "@mikro-orm/migrations": "^6.5.3",
+    "@fastify/jwt": "^10.0.0",
+    "@mikro-orm/core": "7.0.0-rc.0",
+    "@mikro-orm/migrations": "7.0.0-rc.0",
     "@mikro-orm/sql-highlighter": "^1.0.1",
-    "@mikro-orm/sqlite": "^6.5.3",
-    "argon2": "^0.41.1",
-    "fastify": "^4.28.1",
-    "zod": "^3.23.8"
+    "@mikro-orm/sqlite": "7.0.0-rc.0",
+    "argon2": "^0.44.0",
+    "fastify": "^5.7.4",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@mikro-orm/cli": "^6.5.3",
-    "@mikro-orm/reflection": "^6.5.3",
-    "@mikro-orm/seeder": "^6.5.3",
-    "@types/node": "^22.9.0",
+    "@mikro-orm/cli": "7.0.0-rc.0",
+    "@mikro-orm/seeder": "7.0.0-rc.0",
+    "@types/node": "^25.2.2",
     "@types/slug": "^5.0.9",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
-    "vitest": "^2.1.4"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.0-beta.13",
+    "vitest": "^4.0.18"
   },
   "scripts": {
-    "build": "tsc && npx mikro-orm-esm cache:generate --combined",
-    "start": "node --no-warnings=ExperimentalWarning --loader ts-node/esm src/server.ts",
-    "start:prod": "NODE_ENV=production node dist/server.js",
+    "build": "tsc",
+    "bundle": "vite build",
+    "start": "tsx src/server.ts",
+    "start:prod": "node dist/server.js",
     "test": "vitest run"
   }
 }

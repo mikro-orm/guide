@@ -1,8 +1,8 @@
-import { wrap } from '@mikro-orm/sqlite';
-import { FastifyInstance } from 'fastify';
+import { wrap, type EntityData } from '@mikro-orm/sqlite';
+import { type FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { initORM } from '../../db.js';
-import { User } from './user.entity.js';
+import { type User } from './user.entity.js';
 import { getUserFromToken } from '../common/utils.js';
 
 const socialSchema = z.object({
@@ -56,7 +56,7 @@ export async function registerUserRoutes(app: FastifyInstance) {
 
   app.patch('/profile', async request => {
     const user = getUserFromToken(request);
-    wrap(user).assign(request.body as User);
+    wrap(user).assign(request.body as EntityData<User>);
     await db.em.flush();
     return user;
   });

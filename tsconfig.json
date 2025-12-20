@@ -2,11 +2,10 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "target": "ES2022",
+    "target": "ESNext",
     "strict": true,
     "outDir": "dist",
-    "declaration": true,
-    "experimentalDecorators": true
+    "erasableSyntaxOnly": true
   },
   "include": [
     "./src/**/*.ts"

@@ -1,14 +1,14 @@
-import { Collection, Entity, ManyToMany, Property } from '@mikro-orm/sqlite';
-import { Article } from './article.entity.js';
+import { defineEntity, type InferEntity, p } from '@mikro-orm/sqlite';
 import { BaseEntity } from '../common/base.entity.js';
+import { ArticleSchema } from './article.entity.js';
 
-@Entity()
-export class Tag extends BaseEntity {
+export const TagSchema = defineEntity({
+  name: 'Tag',
+  extends: BaseEntity,
+  properties: {
+    name: p.string().length(20),
+    articles: () => p.manyToMany(ArticleSchema).mappedBy('tags'),
+  },
+});
 
-  @Property({ length: 20 })
-  name!: string;
-
-  @ManyToMany({ mappedBy: 'tags' })
-  articles = new Collection<Article>(this);
-
-}
+export type Tag = InferEntity<typeof TagSchema>;

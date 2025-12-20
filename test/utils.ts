@@ -12,7 +12,7 @@ export async function initTestApp(port: number) {
   });
 
   // create the schema so we can use the database
-  await orm.schema.createSchema();
+  await orm.schema.create();
   await orm.seeder.seed(TestSeeder);
 
   const { app } = await bootstrap(port, false);

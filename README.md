@@ -17,7 +17,7 @@ The goal of this guide is to show off the most important features of MikroORM as
 - [Vitest](https://vitest.dev) for testing
 - ECMAScript modules
 - JWT authentication
-- reflection via [ts-morph](https://ts-morph.com)
+- bundling via [Vite](https://vite.dev)
 
 ## What are we building?
 

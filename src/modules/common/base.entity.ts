@@ -1,16 +1,15 @@
-import { OptionalProps, PrimaryKey, Property } from '@mikro-orm/sqlite';
+import { p, defineEntity } from '@mikro-orm/sqlite';
 
-export abstract class BaseEntity<Optional = never> {
+export const BaseSchema = defineEntity({
+  name: 'BaseEntity',
+  abstract: true,
+  properties: {
+    id: p.integer().primary(),
+    createdAt: p.datetime().onCreate(() => new Date()),
+    updatedAt: p.datetime().onCreate(() => new Date()).onUpdate(() => new Date()),
+  },
+});
 
-  [OptionalProps]?: 'createdAt' | 'updatedAt' | Optional;
+export abstract class BaseEntity extends BaseSchema.class {}
 
-  @PrimaryKey()
-  id!: number;
-
-  @Property()
-  createdAt = new Date();
-
-  @Property({ onUpdate: () => new Date() })
-  updatedAt = new Date();
-
-}
+BaseSchema.setClass(BaseEntity);

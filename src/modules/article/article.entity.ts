@@ -1,20 +1,8 @@
-import {
-  Collection,
-  Entity,
-  EntityRepositoryType,
-  ManyToMany,
-  ManyToOne,
-  OneToMany,
-  Property,
-  ref,
-  Ref,
-  Rel,
-  t,
-} from '@mikro-orm/sqlite';
+import { defineEntity, type InferEntity, p } from '@mikro-orm/sqlite';
 import { BaseEntity } from '../common/base.entity.js';
 import { User } from '../user/user.entity.js';
-import { Comment } from './comment.entity.js';
-import { Tag } from './tag.entity.js';
+import { CommentSchema } from './comment.entity.js';
+import { TagSchema } from './tag.entity.js';
 import { ArticleRepository } from './article.repository.js';
 
 function convertToSlug(title: string) {
@@ -23,39 +11,20 @@ function convertToSlug(title: string) {
       .replace(/ +/g, '-');
 }
 
-@Entity({ repository: () => ArticleRepository })
-export class Article extends BaseEntity<'slug'> {
+export const ArticleSchema = defineEntity({
+  name: 'Article',
+  tableName: 'article',
+  repository: () => ArticleRepository,
+  extends: BaseEntity,
+  properties: {
+    slug: p.string().unique().onCreate(article => convertToSlug(article.title)),
+    title: p.string().index(),
+    description: p.string().length(1000),
+    text: p.text().lazy(),
+    tags: () => p.manyToMany(TagSchema),
+    author: () => p.manyToOne(User).ref(),
+    comments: () => p.oneToMany(CommentSchema).mappedBy('article').eager().orphanRemoval(),
+  },
+});
 
-  [EntityRepositoryType]?: ArticleRepository;
-
-  @Property({ unique: true })
-  slug: string;
-
-  @Property({ index: true })
-  title: string;
-
-  @Property({ length: 1000 })
-  description: string;
-
-  @Property({ type: t.text, lazy: true })
-  text: string;
-
-  @ManyToMany()
-  tags = new Collection<Tag>(this);
-
-  @ManyToOne()
-  author: Ref<User>;
-
-  @OneToMany({ mappedBy: 'article', eager: true, orphanRemoval: true })
-  comments = new Collection<Comment>(this);
-
-  constructor(author: Rel<User>, title: string, description = '', text = '') {
-    super();
-    this.author = ref(author);
-    this.title = title;
-    this.description = description;
-    this.text = text;
-    this.slug = convertToSlug(title);
-  }
-
-}
+export type Article = InferEntity<typeof ArticleSchema>;

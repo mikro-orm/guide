@@ -1,4 +1,4 @@
-import { FastifyRequest } from 'fastify';
+import { type FastifyRequest } from 'fastify';
 import { User } from '../user/user.entity.js';
 import { Article } from '../article/article.entity.js';
 
