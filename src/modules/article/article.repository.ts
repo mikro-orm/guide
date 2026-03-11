@@ -1,10 +1,10 @@
 import { type FindOptions, sql, EntityRepository } from '@mikro-orm/sqlite';
-import { type Article, ArticleSchema } from './article.entity.js';
+import { type IArticle, ArticleSchema } from './article.entity.js';
+import { type IArticleListing, ArticleListingSchema } from './article-listing.entity.js';
 import { CommentSchema } from './comment.entity.js';
-import { type ArticleListing, ArticleListingSchema } from './article-listing.entity.js';
 
 // extending the EntityRepository exported from driver package, so we can access things like the QB factory
-export class ArticleRepository extends EntityRepository<Article> {
+export class ArticleRepository extends EntityRepository<IArticle> {
 
   listArticlesQuery() {
     // sub-query for total number of comments
@@ -29,7 +29,7 @@ export class ArticleRepository extends EntityRepository<Article> {
         .addSelect([totalComments, usedTags]);
   }
 
-  async listArticles(options: FindOptions<ArticleListing>) {
+  async listArticles(options: FindOptions<IArticleListing>) {
     const [items, total] = await this.em.findAndCount(ArticleListingSchema, {}, options);
     return { items, total };
   }

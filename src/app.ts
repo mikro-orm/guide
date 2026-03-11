@@ -1,13 +1,13 @@
+import { NotFoundError, RequestContext } from '@mikro-orm/core';
 import { fastify } from 'fastify';
 import fastifyJWT from '@fastify/jwt';
-import { NotFoundError, RequestContext } from '@mikro-orm/sqlite';
 import { initORM } from './db.js';
 import { registerUserRoutes } from './modules/user/routes.js';
 import { registerArticleRoutes } from './modules/article/routes.js';
 import { AuthError } from './modules/common/utils.js';
 
 export async function bootstrap(port = 3001, migrate = true) {
-  const db = await initORM();
+  const db = initORM();
 
   if (migrate) {
     // sync the schema
@@ -22,7 +22,7 @@ export async function bootstrap(port = 3001, migrate = true) {
   });
 
   // register request context hook
-  app.addHook('onRequest', (_request, _reply, done) => {
+  app.addHook('onRequest', (request, reply, done) => {
     RequestContext.create(db.em, done);
   });
 
@@ -56,10 +56,11 @@ export async function bootstrap(port = 3001, migrate = true) {
     await db.orm.close();
   });
 
-  app.register(registerUserRoutes, { prefix: 'user' });
+  // register routes here
   app.register(registerArticleRoutes, { prefix: 'article' });
+  app.register(registerUserRoutes, { prefix: 'user' });
 
   const url = await app.listen({ port });
 
-  return { app, url };
+  return { app, url, db };
 }

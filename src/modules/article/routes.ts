@@ -1,17 +1,16 @@
 import { type FastifyInstance } from 'fastify';
-import { wrap, type EntityData } from '@mikro-orm/sqlite';
+import { wrap, type EntityData } from '@mikro-orm/core';
 import { initORM } from '../../db.js';
-import { type Article } from './article.entity.js';
+import { type IArticle } from './article.entity.js';
 import { getUserFromToken, verifyArticlePermissions } from '../common/utils.js';
 
 export async function registerArticleRoutes(app: FastifyInstance) {
-  const db = await initORM();
+  const db = initORM();
 
   // list articles
   app.get('/', async request => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
 
-    // start with simple findAndCount
     const { items, total } = await db.article.listArticles({
       limit, offset, cache: 5_000,
     });
@@ -27,7 +26,7 @@ export async function registerArticleRoutes(app: FastifyInstance) {
     });
   });
 
-  // create article
+  // create comment
   app.post('/:slug/comment', async request => {
     const { slug, text } = request.params as { slug: string; text: string };
     const author = getUserFromToken(request);
@@ -63,7 +62,7 @@ export async function registerArticleRoutes(app: FastifyInstance) {
     const params = request.params as { id: string };
     const article = await db.article.findOneOrFail(+params.id);
     verifyArticlePermissions(user, article);
-    wrap(article).assign(request.body as EntityData<Article>);
+    wrap(article).assign(request.body as EntityData<IArticle>);
     await db.em.flush();
 
     return article;

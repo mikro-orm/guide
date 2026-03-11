@@ -1,6 +1,6 @@
 import { type FastifyRequest } from 'fastify';
 import { User } from '../user/user.entity.js';
-import { Article } from '../article/article.entity.js';
+import { type IArticle } from '../article/article.entity.js';
 
 export function getUserFromToken(req: FastifyRequest): User {
   if (!req.user) {
@@ -10,7 +10,7 @@ export function getUserFromToken(req: FastifyRequest): User {
   return req.user as User;
 }
 
-export function verifyArticlePermissions(user: User, article: Article): void {
+export function verifyArticlePermissions(user: User, article: IArticle): void {
   if (article.author.id !== user.id) {
     throw new Error('You are not the author of this article!');
   }

@@ -1,15 +1,14 @@
-import type { EntityManager } from '@mikro-orm/sqlite';
+import type { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { User } from '../modules/user/user.entity.js';
+import { UserSchema } from '../modules/user/user.entity.js';
 
 export class TestSeeder extends Seeder {
 
   async run(em: EntityManager): Promise<void> {
-    const author = em.create(User, {
+    const author = em.create(UserSchema, {
       fullName: 'Foo Bar',
       email: 'foo@bar.com',
       password: 'password123',
-      social: { twitter: '@foobar' },
       articles: [
         {
           title: 'title 1/3',

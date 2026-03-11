@@ -1,15 +1,15 @@
-import { defineEntity, type InferEntity, p } from '@mikro-orm/sqlite';
+import { defineEntity, type InferEntity, p } from '@mikro-orm/core';
 import { ArticleSchema } from './article.entity.js';
-import { User } from '../user/user.entity.js';
-import { BaseEntity } from '../common/base.entity.js';
+import { UserSchema } from '../user/user.entity.js';
+import { BaseSchema } from '../common/base.entity.js';
 
 export const CommentSchema = defineEntity({
   name: 'Comment',
-  extends: BaseEntity,
+  extends: BaseSchema,
   properties: {
     text: p.string(),
     article: () => p.manyToOne(ArticleSchema).ref(),
-    author: () => p.manyToOne(User).ref(),
+    author: () => p.manyToOne(UserSchema).ref(),
     deletedAt: p.datetime().nullable(),
   },
   filters: {
@@ -17,4 +17,4 @@ export const CommentSchema = defineEntity({
   },
 });
 
-export type Comment = InferEntity<typeof CommentSchema>;
+export type IComment = InferEntity<typeof CommentSchema>;

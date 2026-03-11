@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from 'vitest';
 import { initORM, type Services } from '../src/db.js';
+import config from '../src/mikro-orm.config.js';
 import { TestSeeder } from '../src/seeders/TestSeeder.js';
 import { CommentSchema } from '../src/modules/article/comment.entity.js';
 import { ArticleSchema } from '../src/modules/article/article.entity.js';
@@ -8,7 +9,8 @@ import { UserSchema } from '../src/modules/user/user.entity.js';
 let db: Services;
 
 beforeAll(async () => {
-  db = await initORM({
+  db = initORM({
+    ...config,
     debug: false,
     dbName: ':memory:',
   });

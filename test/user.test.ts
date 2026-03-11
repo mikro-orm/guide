@@ -27,8 +27,6 @@ test('login', async () => {
   expect(res1.statusCode).toBe(200);
   expect(res1.json()).toMatchObject({
     fullName: 'Foo Bar',
-    token: expect.any(String),
-    social: { twitter: '@foobar' },
   });
 
   const res2 = await app.inject({

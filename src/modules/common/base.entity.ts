@@ -1,4 +1,4 @@
-import { p, defineEntity } from '@mikro-orm/sqlite';
+import { defineEntity, p } from '@mikro-orm/core';
 
 export const BaseSchema = defineEntity({
   name: 'BaseEntity',
@@ -9,7 +9,3 @@ export const BaseSchema = defineEntity({
     updatedAt: p.datetime().onCreate(() => new Date()).onUpdate(() => new Date()),
   },
 });
-
-export abstract class BaseEntity extends BaseSchema.class {}
-
-BaseSchema.setClass(BaseEntity);

@@ -5,7 +5,7 @@ import { AuthError } from '../common/utils.js';
 export class UserRepository extends EntityRepository<User> {
 
   async exists(email: string) {
-    const count = await this.qb().where({ email }).getCount();
+    const count = await this.count({ email });
     return count > 0;
   }
 

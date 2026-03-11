@@ -1,6 +1,6 @@
-import { defineEntity, type InferEntity, p } from '@mikro-orm/sqlite';
-import { BaseEntity } from '../common/base.entity.js';
-import { User } from '../user/user.entity.js';
+import { defineEntity, type InferEntity, p } from '@mikro-orm/core';
+import { BaseSchema } from '../common/base.entity.js';
+import { UserSchema } from '../user/user.entity.js';
 import { CommentSchema } from './comment.entity.js';
 import { TagSchema } from './tag.entity.js';
 import { ArticleRepository } from './article.repository.js';
@@ -13,18 +13,17 @@ function convertToSlug(title: string) {
 
 export const ArticleSchema = defineEntity({
   name: 'Article',
-  tableName: 'article',
+  extends: BaseSchema,
   repository: () => ArticleRepository,
-  extends: BaseEntity,
   properties: {
     slug: p.string().unique().onCreate(article => convertToSlug(article.title)),
     title: p.string().index(),
-    description: p.string().length(1000),
+    description: p.string().length(1000).onCreate(article => article.text.substring(0, 999) + '…'),
     text: p.text().lazy(),
+    author: () => p.manyToOne(UserSchema).ref(),
     tags: () => p.manyToMany(TagSchema),
-    author: () => p.manyToOne(User).ref(),
     comments: () => p.oneToMany(CommentSchema).mappedBy('article').eager().orphanRemoval(),
   },
 });
 
-export type Article = InferEntity<typeof ArticleSchema>;
+export type IArticle = InferEntity<typeof ArticleSchema>;

@@ -1,4 +1,4 @@
-import { wrap, type EntityData } from '@mikro-orm/sqlite';
+import { wrap, type EntityData } from '@mikro-orm/core';
 import { type FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { initORM } from '../../db.js';
@@ -20,7 +20,7 @@ const userSchema = z.object({
 });
 
 export async function registerUserRoutes(app: FastifyInstance) {
-  const db = await initORM();
+  const db = initORM();
 
   // register new user
   app.post('/sign-up', async request => {

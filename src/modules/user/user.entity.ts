@@ -1,12 +1,11 @@
 import {
   defineEntity,
-  p,
-  ref,
-  type EventArgs,
   type InferEntity,
-} from '@mikro-orm/sqlite';
+  type EventArgs,
+  p,
+} from '@mikro-orm/core';
 import { hash, verify } from 'argon2';
-import { BaseEntity } from '../common/base.entity.js';
+import { BaseSchema } from '../common/base.entity.js';
 import { ArticleSchema } from '../article/article.entity.js';
 import { UserRepository } from './user.repository.js';
 
@@ -20,44 +19,40 @@ export const SocialSchema = defineEntity({
   },
 });
 
-export type Social = InferEntity<typeof SocialSchema>;
+export type ISocial = InferEntity<typeof SocialSchema>;
+
+async function hashPassword(args: EventArgs<User>) {
+  // hash only if the value changed
+  const password = args.changeSet?.payload.password;
+
+  if (typeof password === 'string') {
+    args.entity.password = await hash(password);
+  }
+}
 
 export const UserSchema = defineEntity({
   name: 'User',
-  tableName: 'user',
+  extends: BaseSchema,
   repository: () => UserRepository,
-  extends: BaseEntity,
   properties: {
     fullName: p.string(),
-    email: p.string().unique().hidden(),
-    password: p.string().hidden().lazy().ref(),
+    email: p.string(),
+    password: p.string().hidden().lazy(),
     bio: p.text().default(''),
-    articles: () => p.oneToMany(ArticleSchema).mappedBy('author').hidden(),
-    token: p.string().nullable().persist(false),
-    social: () => p.embedded(SocialSchema).object(true).nullable(),
-  },
-  hooks: {
-    beforeCreate: ['hashPassword'],
-    beforeUpdate: ['hashPassword'],
+    articles: () => p.oneToMany(ArticleSchema).mappedBy('author'),
+    token: p.string().persist(false).nullable(),
+    social: () => p.embedded(SocialSchema).object().nullable(),
   },
 });
 
 export class User extends UserSchema.class {
 
-  async hashPassword(args: EventArgs<User>) {
-    // hash only if the value changed
-    const password = args.changeSet?.payload.password;
-
-    if (typeof password === 'string') {
-      this.password = ref(await hash(password));
-    }
-  }
-
   async verifyPassword(password: string) {
-    const hash = await this.password.loadOrFail();
-    return verify(hash, password);
+    return verify(this.password, password);
   }
 
 }
 
 UserSchema.setClass(User);
+UserSchema.addHook('beforeCreate', hashPassword);
+UserSchema.addHook('beforeUpdate', hashPassword);

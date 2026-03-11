@@ -1,20 +1,13 @@
-import { defineEntity, p, type InferEntity } from '@mikro-orm/sqlite';
+import { defineEntity, type InferEntity, type EntityManager, p } from '@mikro-orm/core';
+import { ArticleSchema } from './article.entity.js';
 
 export const ArticleListingSchema = defineEntity({
   name: 'ArticleListing',
-  view: true,
-  expression: `
-    select a.slug, a.title, a.description, a.author_id as author,
-           u.full_name as author_name,
-           (select count(*) from comment c where c.article_id = a.id) as total_comments,
-           (select group_concat(distinct t.name) from article_tags at2
-              join tag t on t.id = at2.tag_id
-              where at2.article_id = a.id) as tags
-    from article a
-    join user u on u.id = a.author_id
-  `,
+  expression: (em: EntityManager) => {
+    return em.getRepository(ArticleSchema).listArticlesQuery();
+  },
   properties: {
-    slug: p.string().primary(),
+    slug: p.string(),
     title: p.string(),
     description: p.string(),
     tags: p.array(),
@@ -24,4 +17,4 @@ export const ArticleListingSchema = defineEntity({
   },
 });
 
-export type ArticleListing = InferEntity<typeof ArticleListingSchema>;
+export type IArticleListing = InferEntity<typeof ArticleListingSchema>;

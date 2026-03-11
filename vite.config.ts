@@ -5,9 +5,9 @@ export default defineConfig({
     ssr: 'src/server.ts',
     outDir: 'dist',
     sourcemap: true,
-    target: 'node24',
+    target: 'node22',
   },
   ssr: {
-    noExternal: ['@mikro-orm/sqlite', '@mikro-orm/sql', '@mikro-orm/core', '@mikro-orm/migrations'],
+    noExternal: ['@mikro-orm/sqlite', '@mikro-orm/sql', '@mikro-orm/core'],
   },
 });
