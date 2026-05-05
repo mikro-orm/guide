@@ -4,6 +4,7 @@
     "moduleResolution": "NodeNext",
     "target": "ES2024",
     "strict": true,
+    "rootDir": "./src",
     "outDir": "dist"
   },
   "include": [
