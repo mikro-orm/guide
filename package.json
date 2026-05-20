@@ -9,16 +9,16 @@
   "homepage": "https://mikro-orm.io/docs/guide",
   "dependencies": {
     "@fastify/jwt": "^10.0.0",
-    "@mikro-orm/core": "^7.0.14",
-    "@mikro-orm/migrations": "^7.0.14",
-    "@mikro-orm/sqlite": "^7.0.14",
+    "@mikro-orm/core": "^7.1.0",
+    "@mikro-orm/migrations": "^7.1.0",
+    "@mikro-orm/sqlite": "^7.1.0",
     "argon2": "^0.44.0",
     "fastify": "^5.8.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@mikro-orm/cli": "^7.0.14",
-    "@mikro-orm/seeder": "^7.0.14",
+    "@mikro-orm/cli": "^7.1.0",
+    "@mikro-orm/seeder": "^7.1.0",
     "@types/node": "^25.6.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
