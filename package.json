@@ -20,6 +20,7 @@
     "@mikro-orm/cli": "^7.1.0",
     "@mikro-orm/seeder": "^7.1.0",
     "@types/node": "^26.0.0",
+    "patch-package": "^8.0.1",
     "tsx": "^4.21.0",
     "typescript": "^7.0.0",
     "vite": "^8.0.10",
@@ -28,8 +29,12 @@
   "scripts": {
     "build": "tsc",
     "bundle": "vite build",
+    "postinstall": "patch-package",
     "start": "tsx src/server.ts",
     "start:prod": "node dist/server.js",
     "test": "vitest"
+  },
+  "overrides": {
+    "thread-stream": "4.2.0"
   }
 }
