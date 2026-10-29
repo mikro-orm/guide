@@ -29,7 +29,7 @@
   "scripts": {
     "build": "tsc",
     "bundle": "vite build",
-    "postinstall": "patch-package",
+    "postinstall": "node -e \"const fs = require('node:fs'); if (fs.existsSync('node_modules/patch-package/index.js')) require('node:child_process').execFileSync(process.execPath, ['node_modules/patch-package/index.js'], { stdio: 'inherit' })\"",
     "start": "tsx src/server.ts",
     "start:prod": "node dist/server.js",
     "test": "vitest"
